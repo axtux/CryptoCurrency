@@ -99,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Visual Paradigm
+*.vux
+*.vpp.bak*
+*.vpp.vbak
