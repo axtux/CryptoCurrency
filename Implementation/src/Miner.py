@@ -36,6 +36,7 @@ class Miner:
  	def mine(self)
  		""" Je sais pas comment faire mais ce serrait bien d'avoir la possibilité d'interrompre le mining avec un certain bouton car ça peut pottentiellement durer très longtemps.
 		Si les relay nodes n'ont pas de transaction à donner, le miner restera bloqué dans cette fonction """
+		self._flag = 0
  		foundCombination = (self.hashTransactions() >= difficulty)
  		while foundCombination == false:
  			permutation = list(itertools.permutations(self._transactions))
