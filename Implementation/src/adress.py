@@ -1,5 +1,6 @@
-from Crypto.Util import number
+import utils
 import math
+import random
 
 class adress(object):
     """The private and public key for the Wallet
@@ -12,5 +13,9 @@ class adress(object):
 
     def generate(self):
         """Generate a private and public key"""
-        self.publicKey = 1
-        self.privateKey = 1
+        self.privateKey = utils.generateDSAKey()    # Encrypt with AES
+        self.publicKey = self.privateKey.publickey()
+
+    def signature(self, m):
+        k = random.randint(2, self.publicKey.q - 1)
+        return self.privateKey.sign()
