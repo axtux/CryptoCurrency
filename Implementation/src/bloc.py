@@ -1,7 +1,8 @@
+import hashlib
 class bloc:
-    def __init__(self):
+    def __init__(self,prevHash):
         self.transactions=[]
-        self.previousHash=0
+        self.previousHash=prevHash
         self.pow=0
         self.difficulty=0
         self.size=10 #On peut changer plus tard
@@ -11,3 +12,16 @@ class bloc:
             self.transactions.append(transaction)
         else:
             raise BlocFull('The bloc is full')
+
+    def __str__(self):
+        tmp=""
+        tmp=tmp+str(self.previousHash)
+        for(t in self.transactions):
+            tmp=tmp+str(i)
+        return tmp
+
+    def hash(self,proof):
+        self.pow=proof
+        h=hashlib.sha256()
+        h.update(str(self))
+        return h.digest()
