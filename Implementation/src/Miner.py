@@ -1,4 +1,6 @@
 import utils.py
+import bloc.py
+import wallet.py
 """import l'interface contenant toutes les methodes cryptographics"""
 import itertools
 """ import d'outil pour générer toutes les permutations d'une liste """
@@ -19,40 +21,29 @@ class Miner:
 	def __init__(self):
 		self._transactions = []
 		self._mining = 0
-		"flag to show that they are mining and must not be sent transactions"
-		self._money = 0
+        self.wallet=wallet()
+        self.bloc=bloc()
 
 
-	def hashTransactions(self, start = 0, stop = len(_transactions)):
-		""" Methodes recursives qui hash les transactions """
-		if stop - start == 0:
-			return hash(_transactions[start]);
-		else:
-			hash1 = self.hashTransactions(start, start + (stop-start)//2);
-			hash2 = self.hashTransactions(start + (stop-start)//2 + 1, stop);
- 			return hash(hash1 + hash2);
 
+    def act(self):
+        #TODO check if new transaction with relay node
+        mine()
+        if(isBlocValid()):
+            #TODO send bloc to relay node
 
- 	def mine(self)
- 		""" Je sais pas comment faire mais ce serrait bien d'avoir la possibilité d'interrompre le mining avec un certain bouton car ça peut pottentiellement durer très longtemps.
-		Si les relay nodes n'ont pas de transaction à donner, le miner restera bloqué dans cette fonction """
-		self._flag = 1
- 		foundCombination = (self.hashTransactions() >= difficulty)
- 		while foundCombination == false:
- 			permutation = list(itertools.permutations(self._transactions))
- 			i = 1
- 			while i < len(permutation):
- 				self._transactions = permutation[i]
- 				if self.hashTransactions() < difficulty:
- 					break
- 				i += 1
- 			if i < len(permutation):
- 				break
- 			if len(self._transactions > 20):
- 				"sinon calculer les permutation devient trop longs"
- 				self._transactions = []
- 			self.requestTransactions()
- 			foundCombination = (self.hashTransactions() >= difficulty)
+ 	def mine(self):
+        digest=self.bloc.hash(self.bloc.pow+1)
+        return digest
+
+    def isBlocValid(self):
+        check=True
+        digest= self.bloc.hash(self.bloc.pow)
+        for (i in range(0,self.bloc.difficulty)):
+            if !(digest[i] == "0") :
+                check=False
+        return check
+
 
 	def submitTransactions():
 		""" Donne les transactions dans l'ordre qui donne une bonnne valeur à un relay Node"""
