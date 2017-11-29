@@ -23,5 +23,5 @@ class bloc:
     def hash(self,proof):
         self.pow=proof
         h=hashlib.sha256()
-        h.update(str(self))
+        h.update(str(self)+str(proof))
         return h.digest()
