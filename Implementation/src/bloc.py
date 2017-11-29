@@ -16,7 +16,7 @@ class bloc:
     def __str__(self):
         tmp=""
         tmp=tmp+str(self.previousHash)
-        for(t in self.transactions):
+        for t in self.transactions:
             tmp=tmp+str(i)
         return tmp
 
