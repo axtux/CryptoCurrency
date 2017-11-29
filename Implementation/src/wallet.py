@@ -6,15 +6,28 @@ class wallet(object):
     """Wallet is the principal user
     Wallet have money and can create some Transaction to send money to an another Wallet"""
 
-    def __init__(self):
+    def __init__(self, AES_Key=None, addr=None):
+        """Create a new wallet
+
+        AES_key : The AES from the user using to encrypt / decrypt his private key
+                If the AES_Key was not correct, the private key will not be correct and not be able to sign a transaction
+        addr    : The current adress from the user
+                If the addr was not correct, the AES_Key will not be able to sign a transaction
+                """
+
         super(wallet, self).__init__()
-        self.actualKey = adress("5369787465656e2062797465206b6579")
+        if AES_Key == None:
+            self.actualKey = adress(utils.generateAESKey(), addr)
+        else:
+            self.actualKey = adress(AES_Key, addr)
         self.oldKey = []
         self.count = 0
 
     def createTransaction(self, money, to):
         """Create a new transaction to send it to the RelayNode"""
-        transac = transaction(self.adress, money, to) #Class a créer
+        transac = transaction(self.adress, money, to)
+        self.oldKey.append(self.adress)
+        #New adrees
         return None
 
     def signature(self, m):
@@ -22,6 +35,7 @@ class wallet(object):
             To verify : publicKey.verify(m, signature)
             (see Crypto.PublicKey.DSA lib)"""
         return self.actualKey.publicKey, self.actualKey.signature(m)
+
 
 
 

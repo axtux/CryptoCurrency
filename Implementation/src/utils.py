@@ -27,6 +27,11 @@ def decrypt_AES(key, m, iv):
     """Decrypt a byte string cipherText with a key and a random iv"""
     return AES.new(key, AES.MODE_CFB, iv).decrypt(m)
 
+def generateAESKey():
+    """Generate a random AES-128 key
+        The "0x" at the begining of the hex number is remove for some function (bytes.fromhex)"""
+    return hex(random.getrandbits(128))[2:]
+
 def iv():
     return Random.new().read(AES.block_size)
 
