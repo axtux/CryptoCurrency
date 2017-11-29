@@ -1,4 +1,4 @@
-import CryptoInterface
+import utils.py
 """import l'interface contenant toutes les methodes cryptographics"""
 import itertools
 """ import d'outil pour générer toutes les permutations d'une liste """
@@ -53,13 +53,6 @@ class Miner:
  				self._transactions = []
  			self.requestTransactions()
  			foundCombination = (self.hashTransactions() >= difficulty)
-
- 				
-
-
-	def requestTransactions(self):
-		""" Je sais pas comment transmettre des demandes d'une adresse a une autre
-		Il faudra définir combien de transaction ça rajoute"""
 
 	def submitTransactions():
 		""" Donne les transactions dans l'ordre qui donne une bonnne valeur à un relay Node"""
