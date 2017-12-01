@@ -4,12 +4,12 @@ from hashlib import sha256
 import math
 import random
 
-class adress(object):
+class Address(object):
     """The private and public key for the Wallet
     The public key is also the adresse to make transaction with the Wallet"""
 
     def __init__(self, AES_Key, addr=None):
-        super(adress, self).__init__()
+        super(Address, self).__init__()
         print ("                     Good Morning !")
         print ("                  This is your AES Key")
         print ("It's REALLY important so, remenber it and NEVER forgive")
@@ -20,7 +20,7 @@ class adress(object):
             self.privateKey = generateDSAKey()
             self.privateKey.x = encrypt_AES(bytes.fromhex(AES_Key), intToBytes(self.privateKey.x), self.iv)
             self.publicKey = self.privateKey.publickey()
-            self.adress = self.hash()
+            self.address = self.hash()
         else:
             self.address = addr
             #Check private and public key in BDD

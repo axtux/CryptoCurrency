@@ -1,8 +1,8 @@
-from adress import adress
+from address import Address
 import random
 import utils
 
-class wallet(object):
+class Wallet(object):
     """Wallet is the principal user
     Wallet have money and can create some Transaction to send money to an another Wallet"""
 
@@ -15,18 +15,18 @@ class wallet(object):
                 If the addr was not correct, the AES_Key will not be able to sign a transaction
                 """
 
-        super(wallet, self).__init__()
+        super(Wallet, self).__init__()
         if AES_Key == None:
-            self.actualKey = adress(utils.generateAESKey(), addr)
+            self.actualKey = Address(utils.generateAESKey(), addr)
         else:
-            self.actualKey = adress(AES_Key, addr)
+            self.actualKey = Address(AES_Key, addr)
         self.oldKey = []
         self.count = 0
 
     def createTransaction(self, money, to):
         """Create a new transaction to send it to the RelayNode"""
-        transac = transaction(self.adress, money, to)
-        self.oldKey.append(self.adress)
+        transac = transaction(self.actualKey, money, to)
+        self.oldKey.append(self.actualKey)
         #New adrees
         return None
 
@@ -39,7 +39,7 @@ class wallet(object):
 
 
 
-w = wallet()
+w = Wallet()
 k = w.actualKey
 print(hex(k.publicKey.y))
 print(hex(k.publicKey.g))
@@ -48,4 +48,4 @@ print(hex(k.publicKey.q))
 print(k.privateKey.x)
 print(utils.bytesToInt(utils.decrypt_AES(bytes.fromhex("5369787465656e2062797465206b6579"), k.privateKey.x, k.iv)))
 print("-----")
-print(k.adress)
+print(k.address)
