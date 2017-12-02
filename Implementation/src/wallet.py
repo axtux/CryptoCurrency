@@ -16,12 +16,15 @@ class Wallet(object):
                 """
 
         super(Wallet, self).__init__()
-        if AES_Key == None:
-            self.actualKey = Address(utils.generateAESKey(), addr)
+        if addr == None:    #New Wallet : Create the first Address
+            self.addrList = [ Address(AES_Key) ]
         else:
-            self.actualKey = Address(AES_Key, addr)
-        self.oldKey = []
-        self.count = 0
+            self.addrList = addr    #The principal address is the first (index 0)
+        self.count = self.checkCount()
+
+    def checkCount(self):
+        """Check, with the actul address, the Wallet value in the BlockChain"""
+        return 0
 
     def createTransaction(self, money, to):
         """Create a new transaction to send it to the RelayNode"""
@@ -38,7 +41,7 @@ class Wallet(object):
 
 
 
-
+"""
 w = Wallet()
 k = w.actualKey
 print(hex(k.publicKey.y))
@@ -49,3 +52,4 @@ print(k.privateKey.x)
 print(utils.bytesToInt(utils.decrypt_AES(bytes.fromhex("5369787465656e2062797465206b6579"), k.privateKey.x, k.iv)))
 print("-----")
 print(k.address)
+"""

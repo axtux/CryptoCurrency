@@ -8,23 +8,18 @@ class Address(object):
     """The private and public key for the Wallet
     The public key is also the adresse to make transaction with the Wallet"""
 
-    def __init__(self, AES_Key, addr=None):
+    def __init__(self, AES_Key=None, addr=None):
         super(Address, self).__init__()
-        print ("                     Good Morning !")
-        print ("                  This is your AES Key")
-        print ("It's REALLY important so, remenber it and NEVER forgive")
-        print ("          "+AES_Key)
-
-        if addr == None:
+        if addr == None:    #Generate  a new address
             self.iv = iv()
             self.privateKey = generateDSAKey()
             self.privateKey.x = encrypt_AES(bytes.fromhex(AES_Key), intToBytes(self.privateKey.x), self.iv)
             self.publicKey = self.privateKey.publickey()
             self.address = self.hash()
-        else:
+        else:   #Load an existing address
             self.address = addr
-            #Check private and public key in BDD
-            #Private key is still encrypt in the BDD with AES
+            #Check private and public key in DB
+            #Private key is still encrypt in the DB with AES
 
     def signature(self, m):
         k = random.randint(2, self.publicKey.q - 1)

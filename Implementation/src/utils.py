@@ -2,6 +2,7 @@ from Crypto.Util import number
 from Crypto.PublicKey import DSA
 from Crypto.Cipher import AES
 from Crypto import Random
+from hashlib import sha256
 import random
 
 
@@ -35,6 +36,18 @@ def generateAESKey():
 def iv():
     return Random.new().read(AES.block_size)
 
+def sha_256(text):
+    """hash the content of text
+
+       text : String or list of String"""
+    h = sha256()
+    if type(text) == str:
+        h.update(text.encode('utf-8'))
+    else: #type(text) == list
+        for i in text:
+            h.update(i.encode('utf-8'))
+    return h.hexdigest()
+
 
 """
 #Some test
@@ -65,3 +78,5 @@ print(key2)
 print(ci)
 print(pl)
 """
+
+print(sha_256("veryGoodPassword"))
