@@ -4,22 +4,22 @@ from wallet import Wallet
 
 class Connection(object):
     """Wallet connection
-       The user uses it to connect him to his wallet"""
+    The user uses it to connect him to his wallet
+    """
 
     def __init__(self):
-        super(Connection, self).__init__()
+        pass
 
     def allowConnection(self, id, password, newWallet=False):
         """Create or connecte to a wallet
-
+        
         id          : The identification of the user
         password    : The password of the user
         newWallet   : True to create a new wallet with these information
-                      False to connecte to user to his Wallet"""
-
-
+                      False to connecte to user to his Wallet
+        """
         if newWallet:
-            self.createUser(id, sha_256(password)[:16]+sha_256(password[:48]))
+            self.createUser(id, sha_256(password)[:16] + sha_256(password[:48]))
             return Wallet(AES_Key=sha_256(password)[16:48])
         elif self.userExist(id, sha_256(password)[:16]+sha_256(password[:48])):
             #check id and password (hash [:16]+[48:]) in the DB
@@ -31,22 +31,24 @@ class Connection(object):
             return None
 
     def userExist(self, id, hashPassword):
-        """Check in the DB if the user exist AND have enter the good password"""
-        #Check
+        """Check in the DB if the user exist AND have enter the good password
+        """
+        # TODO: Check
         return True
 
     def addrList(self, id):
-        """Return a list of Address object with all address of the user in the DB"""
+        """Return a list of Address object with all address of the user in the DB
+        """
         return []
 
     def createUser(self, id, hashPassword):
-        """Create a new Wallet on the DB"""
-        #DB creation
+        """Create a new Wallet on the DB
+        """
+        #TODO: DB creation
         pass
 
 
-
-
-conn = Connection()
-w = conn.allowConnection("prout", "megaPassword")
-print(w.count)
+if __name__ == '__main__':
+    conn = Connection()
+    w = conn.allowConnection("prout", "megaPassword")
+    print(w.count)

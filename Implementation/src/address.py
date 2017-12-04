@@ -1,15 +1,16 @@
-from utils import generateDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES
-from Crypto import Random
-from hashlib import sha256
 import math
 import random
+from hashlib import sha256
+from Crypto import Random
+from utils import generateDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES
+
 
 class Address(object):
     """The private and public key for the Wallet
-    The public key is also the adresse to make transaction with the Wallet"""
+    The public key is also the adresse to make transaction with the Wallet
+    """
 
     def __init__(self, AES_Key=None, addr=None):
-        super(Address, self).__init__()
         if addr == None:    #Generate  a new address
             self.iv = iv()
             self.privateKey = generateDSAKey()
@@ -28,7 +29,8 @@ class Address(object):
     def hash(self):
         """Create a hash with the Public Key to make an adress
         The update function from hashlib add a string ton a list
-        The hexdigest function from hashlib hash all the data send with update and return it in hexadecimal"""
+        The hexdigest function from hashlib hash all the data send with update and return it in hexadecimal
+        """
         h = sha256()
         h.update(str(self.publicKey.y).encode('utf-8'))
         h.update(str(self.publicKey.g).encode('utf-8'))
