@@ -1,0 +1,29 @@
+
+Pv réunion 6/12
+
+A faire:
+
+- master node : mise à jour de la blockchain + vérif qu'il est contacté que pas des relay nodes + prévenir les relays nodes lors d'un ajout
+
+- relay node : 
+
+- wallet : bdd locale pour garder les anciennes adresses + lors d'une transaction, envoi du montant sur une nouvelle adresse pour envoyer la transaction et stockage de l'ancienne
+
+- blockchain : bdd pour inclure le montant sur chaque adresse + flag si une adresse a déjà été utilisée
+
+- transaction : interdire les transactions de 0
+
+
+
+Question en suspens :
+
+Que faire si 2 transactions provenant de la même adresse (suite à un hack par ex)
+
+
+
+
+Si on a le temps :
+
+- json -> binaire
+
+- push depuis le master node vers les relay nodes
