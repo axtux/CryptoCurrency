@@ -37,10 +37,13 @@ IP_RELAY = [
 """
 
 def getBlockChain():
-  return "blockchain"
+  #TODO get blocks
+  blocks=[]
+  return json.dumps(blocks)
 
-def submitBlock():
-  return "submitBlock"
+def submitBlock(json):
+  #TODO add to block chain
+  return True
 
  
 # HTTPRequestHandler class
