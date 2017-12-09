@@ -61,7 +61,7 @@ class Blockchain:
 		conn.commit()
 		conn.close()
 
-	def get_next_block(self, hash)
+	def get_next_block(self, hash):
 		conn = sqlite3.connect("Blockchain.db")
 		id = hash
 		cursor.execute("""SELECT id, Transactions, Proof_of_work , Difficulty FROM users WHERE id=?""", (id,))
