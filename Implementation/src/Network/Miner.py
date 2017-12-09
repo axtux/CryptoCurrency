@@ -33,14 +33,12 @@ def getNumber():
 	
 
 def makeGet(server):
-	data = False
 	r = requests.get(server+"/getWork/")
 	print(r.text)
 	
 	if r.status_code==200:
 		return r.text
 	else:
-		print("eoi")
 		raise Exception()
 
 def getWork():
@@ -52,20 +50,19 @@ def getWork():
 		except Exception as e:
 			i +=1
 			start	= (start + 1) % len(IP_RELAY)
-			raise e
 		
 		
 #  post transaction
 	
 
 def makeSubmit(server, data):
-	data = False
-	r = requests.post(server+"/submitTransaction/",data=data)
+	r = requests.post(server+"/submitBlock/",data=data)
 	
 	if r.status_code==200:
 		return True
 	else:
-		raise Exception()
+		print()
+		raise Exception(r.text)
 
 def submitBlock(block):
 	i=0
@@ -73,10 +70,10 @@ def submitBlock(block):
 	while (i<MAX_ITER):
 		try:
 			return makeSubmit(IP_RELAY[start], block.toJson())
-		except:
+		except Exception as e:
 			i +=1
-			start	= (start + 1) % len(IP_RELAY)	
-			print(e)
+			start	= (start + 1) % len(IP_RELAY)
+			raise (e)
 		
 		
 		

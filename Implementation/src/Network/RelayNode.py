@@ -22,6 +22,11 @@ MASTER_URL = 'http://127.0.20.1:8081'
 				getBlock()
 				processBlock(block)
 
+		for relay node to master
+			to optain blockchain:  (see doTest)
+				getBlock()
+				processBlock(block)
+
 
 
 """
@@ -54,18 +59,33 @@ def getBlock():
 	ouput: True if ok, False else
 """
 def processBlock(block):
+	print(block)
 	return True
 
 
 
-### INTERNAT STUFF ##
+### PUlic Method ##
 
 
 
 # Obtain a copy of the blockchain
 def getBlockchain():
-	data = False
-	r = requests.get(MASTER_URL+"/blockchain")
+	str = doGetBlockchain()
+	array = json.loads(str)
+	return [Block.fromJson(v) for v in array]
+	 
+	 
+# submit a block
+def submitBlock(block):
+	return doSubmitBlockchain(block.toJson())
+
+
+
+### INTERNAT STUFF ##
+
+# Obtain a copy of the blockchain
+def doGetBlockchain():
+	r = requests.get(MASTER_URL+"/blockchain/")
 	
 	if r.status_code==200:
 		return r.text
@@ -77,29 +97,27 @@ def getBlockchain():
 # submit a block
 	
 
-def submitBlockchain(data):
-	data = False
+def doSubmitBlockchain(data):
 	r = requests.post(MASTER_URL+"/blockchain/",data=data)
 	
 	if r.status_code==200:
 		return r.text
 	else:
 		raise Exception
-
-
  
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 	def getTransactionResponse(self,id):
-		return getTransaction()
+		res = getTransaction(id)
+		return json.dumps((res[0],res[1].toJson()))
 	def postTransactionResponse(self,data):
-		return processTransaction(Transaction(**data))
+		return processTransaction(Transaction.fromJson(data))
 	
 	def getWorkResponse(self):
 		return getBlock().toJson()
 		
 	def submitWorkResponse(self,data):
-		return processBlock(Block(**data))
+		return processBlock(Block.fromJson(data))
 
 	def sendResponse(self,txt,ContentType="text/json"):
 		self.send_response(200)
@@ -128,21 +146,17 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 	def do_POST(self):
 		try:
 			resp=""			
-			data = json.loads(self.rfile.read(int(self.headers['Content-Length'])).decode("utf-8") )
+			data = (self.rfile.read(int(self.headers['Content-Length'])).decode("utf-8") )
+			print(data)
 			if self.path == "/transaction/":
-				resp = self.postTransactionResponse(json)
-			elif self.path == "/submitBlock" :
-				resp = self.submitWorkResponse(json)        
+				self.sendResponse(self.postTransactionResponse(data))
+			elif self.path == "/submitBlock/" :
+				self.sendResponse(self.submitWorkResponse(data) )       
 			else:        
 				self.send_error(404, str(self.path)+" not found")
-				return
-
-			self.send_header('Content-type','text/html')
-			self.end_headers()
-	 
-			self.wfile.write(bytes(str(resp), "utf8"))
 			return
 		except Exception as e:
+			print(e)
 			self.send_error(500, str(e))
 
  
@@ -155,12 +169,15 @@ def run():
 	httpd.serve_forever()
  
  
-run()
+ 
+if __name__ == '__main__':
+    run()
 
 
 
 def doTEST():
-	pass
+	getBlockchain()
+	submitBlock(Block("42"))
 
 
 
