@@ -3,8 +3,10 @@
 For this project, we'll use Python 3.
 To compile the project, you'll have to install the pycrypto library (version 2.6.1) - you can download it on https://www.dlitz.net/software/pycrypto/
 
-
+Before compiling the project, make sure that you have the  package  request installed in order to handle network.
+You can find inside the file install of Network folder, required command line for package  request installation.
 # How to setup the network
+
 
 # How to use the wallet
 
