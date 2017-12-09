@@ -3,7 +3,6 @@ import block.py
 import sqlite3 
 
 conn = sqlite3.connect("Blockchain.db")
-# Pas sur de ce que je fais, DB et server ça me connais pas
 
 conn.execute("""
 CREATE TABLE IF NOT EXISTS Blockchain_blocks (
