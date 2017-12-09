@@ -45,14 +45,14 @@ class Blockchain:
 		for i in len(block.transactions):
 			cursor.execute("""SELECT address, money_of_address, flag FROM Blochain_address WHERE address=?""", (block.transactions[i].receiver,))
 			temp = cursor.fetchone()
-			if type(temp) = "NoneType":
+			if type(temp) == "NoneType":
 				conn.execute("INSERT INTO Blockchain_address (address, money_of_address, flag) VALUES (block.transactions[i].receiver, block.transactions[i].amount, FALSE)");
 			else:
 				temp_amount = temp[1] + block.transactions[i].amount
 				conn.execute("UPDATE Blockchain_address set money_of_address = temp_amount where address = block.transactions[i].receiver");
 			cursor.execute("""SELECT address, money_of_address, flag FROM Blochain_address WHERE address=?""", (block.transactions[i].sender,))
 			temp = cursor.fetchone()
-			if type(temp) = "NoneType":
+			if type(temp) == "NoneType":
 				conn.execute("INSERT INTO Blockchain_address (address, money_of_address, flag) VALUES (block.transactions[i].sender, block.transactions[i].amount, TRUE)");
 			else:
 				temp_amount = temp[1] - block.transactions[i].amount
