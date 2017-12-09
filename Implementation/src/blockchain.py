@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS Blockchain_blocks (
     hash_of_previous_block CHAR(256) PRIMARY KEY,
     transactions CHAR(50),
     proof_of_work INTEGER DEFAULT NULL,
-    difficulty INTEGER DEFAULT NULL,
+    difficulty INTEGER DEFAULT NULL
 );
 """)
 #Pas sur de la longeur du digest ni de la longeur d'une transaction, on pourrait optimiser ça
@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS Blockchain_blocks (
 conn.execute("""
 CREATE TABLE IF NOT EXISTS Blockchain_address (
     address CHAR(256) PRIMARY KEY,
-    money_of_address CHAR(50), # Je sais pas quel longeur ont les transactions
-    flag BOOLEAN,
+    money_of_address CHAR(50),
+    flag BOOLEAN
 );
 """)
 
