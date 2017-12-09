@@ -1,9 +1,11 @@
-#!/usr/bin/env python 
 import requests
 
-
 from random import randint
-from ..block import BLOCK
+
+
+import sys
+sys.path.insert(0,'..')
+from block import Block
 
 MAX_ITER = 5
 IP_RELAY = [
@@ -27,16 +29,18 @@ IP_RELAY = [
 #  Get transaction
 
 def getNumber():
-	return (randint(0, len(IP_RELAY)))
+	return (randint(0, len(IP_RELAY)-1))
 	
 
 def makeGet(server):
 	data = False
 	r = requests.get(server+"/getWork/")
+	print(r.text)
 	
 	if r.status_code==200:
 		return r.text
 	else:
+		print("eoi")
 		raise Exception()
 
 def getWork():
@@ -44,11 +48,11 @@ def getWork():
 	start= getNumber();
 	while (i<MAX_ITER):
 		try:
-			return Block().toJson(makeGet(IP_RELAY[start]))
-		except:
+			return Block.fromJson(makeGet(IP_RELAY[start]))
+		except Exception as e:
 			i +=1
 			start	= (start + 1) % len(IP_RELAY)
-			print(e)
+			raise e
 		
 		
 #  post transaction
@@ -80,7 +84,7 @@ def submitBlock(block):
 def doTest():
 	block= getWork()
 	try:		
-		if(submitBlock(block))
+		if(submitBlock(block)):
 			print("ok")
 	except Exception as e:
 		print("ko")

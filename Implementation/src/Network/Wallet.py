@@ -29,7 +29,7 @@ IP_RELAY = [
 #  Get transaction
 
 def getNumber():
-	return (randint(0, len(IP_RELAY)))
+	return (randint(0, len(IP_RELAY)-1))
 	
 
 def makeGet(server, id):

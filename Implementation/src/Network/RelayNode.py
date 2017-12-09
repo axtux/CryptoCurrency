@@ -1,10 +1,12 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import requests
 import json
 
-from ..transaction import Transaction
-from ..block import Block
+import sys
+sys.path.insert(0,'..')
+from transaction import Transaction
+from block import Block
 
 MY_IP= '127.0.1.1'
 MASTER_URL = 'http://127.0.20.1:8081'
@@ -45,7 +47,7 @@ def processTransaction(transaction):
 	ouput: Block to mine
 """
 def getBlock():
-	return Block()
+	return Block("42")
 
 """
 	input: a block object
@@ -94,30 +96,28 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 		return processTransaction(Transaction(**data))
 	
 	def getWorkResponse(self):
-		return getBlock()
+		return getBlock().toJson()
 		
 	def submitWorkResponse(self,data):
 		return processBlock(Block(**data))
- 
+
+	def sendResponse(self,txt,ContentType="text/json"):
+		self.send_response(200)
+		self.send_header('Content-type',ContentType)
+		self.end_headers()
+		message = str(txt)
+				# Write content as utf-8 data
+		self.wfile.write(bytes(message, "utf8"))
 	# GET
 	def do_GET(self):
 		try:
-			resp=""
 			if self.path.startswith("/transaction/"):
 				id = 5 #parse id
-				resp = self.getTransactionResponse(id)
-			elif self.path == "/getWork" :
-				resp = self.getWorkResponse()        
+				self.sendResponse(self.getTransactionResponse(id))
+			elif self.path == "/getWork/" :
+				self.sendResponse(self.getWorkResponse())        
 			else:        
 				self.send_error(404, str(self.path)+" not found")
-				return
-
-			self.send_header('Content-type','text/json')
-			self.end_headers()
-
-			print(resp)
-	 
-			self.wfile.write(bytes(str(resp), "utf8"))
 			return 
 		except Exception as e:
 			self.send_error(500, str(e))
@@ -137,7 +137,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 				self.send_error(404, str(self.path)+" not found")
 				return
 
-			self.send_header('Content-type','text/json')
+			self.send_header('Content-type','text/html')
 			self.end_headers()
 	 
 			self.wfile.write(bytes(str(resp), "utf8"))
@@ -160,6 +160,7 @@ run()
 
 
 def doTEST():
+	pass
 
 
 
