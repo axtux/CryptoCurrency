@@ -1,5 +1,5 @@
-import utils.py import sha_256
-import block.py
+from utils import sha_256
+from block import Block
 import sqlite3 
 
 conn = sqlite3.connect("Blockchain.db")
