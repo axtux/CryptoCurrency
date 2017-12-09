@@ -16,6 +16,5 @@ class Transaction(object):
 
     @staticmethod
     def fromJson(data):
-        print(data)
         data= json.loads(data)
         return Transaction(**data)

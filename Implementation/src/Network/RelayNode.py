@@ -92,7 +92,8 @@ def submitBlockchain(data):
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 	def getTransactionResponse(self,id):
-		return getTransaction()
+		res = getTransaction(id)
+		return json.dumps((res[0],res[1].toJson()))
 	def postTransactionResponse(self,data):
 		return processTransaction(Transaction.fromJson(data))
 	
@@ -130,7 +131,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 		try:
 			resp=""			
 			data = (self.rfile.read(int(self.headers['Content-Length'])).decode("utf-8") )
-			
+			print(data)
 			if self.path == "/transaction/":
 				self.sendResponse(self.postTransactionResponse(data))
 			elif self.path == "/submitBlock/" :

@@ -2,7 +2,10 @@
 import requests
 import json
 from random import randint
-from ..transaction import Transaction
+
+import sys
+sys.path.insert(0,'..')
+from transaction import Transaction
 
 MAX_ITER = 5
 IP_RELAY = [
@@ -33,14 +36,13 @@ def getNumber():
 	
 
 def makeGet(server, id):
-	data = False
-	print("ygg")
-	print(server)
 	r = requests.get(str(server)+"/transaction/"+str(id))
 	
 	if r.status_code==200:
 		return r.text
 	else:
+		print("code"+str(r.status_code))
+		print(r.text)
 		raise Exception()
 
 def getTransaction(id):
@@ -48,13 +50,11 @@ def getTransaction(id):
 	start= getNumber();
 	while (i<MAX_ITER):
 		try:
-			print(start)
-			print(IP_RELAY[start])
 			res = makeGet(IP_RELAY[start], id)
 			js =  json.loads(res)
-			js[1] = Transaction().fromJson(json.dumps(js[1]))
+			js[1] = Transaction.fromJson(js[1])
 			return js
-		except:
+		except Exception as e:
 			i +=1
 			start	= (start + 1) % len(IP_RELAY)
 		
@@ -63,7 +63,6 @@ def getTransaction(id):
 	
 
 def makePost(server, data):
-	data = False
 	r = requests.post(str(server)+"/transaction/",data=data)
 	
 	if r.status_code==200:
@@ -94,7 +93,7 @@ def doTest():
 	else:
 		print("trans id ko")
 		
-	if json.dumps(trans)==json.dumps(trans2[1]):
+	if trans.toJson()==trans2[1].toJson():
 		print("trans ok")
 	else:
 		print("trans ko")

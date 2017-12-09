@@ -40,7 +40,6 @@ def makeGet(server):
 	if r.status_code==200:
 		return r.text
 	else:
-		print("eoi")
 		raise Exception()
 
 def getWork():
@@ -52,7 +51,6 @@ def getWork():
 		except Exception as e:
 			i +=1
 			start	= (start + 1) % len(IP_RELAY)
-			raise e
 		
 		
 #  post transaction
