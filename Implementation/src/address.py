@@ -2,8 +2,8 @@ import math
 import random
 from hashlib import sha256
 from Crypto import Random
-from utils import generateDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES
-
+from utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, sha_256
+import sqlite3
 
 class Address(object):
     """The private and public key for the Wallet
@@ -14,17 +14,44 @@ class Address(object):
         if addr == None:    #Generate  a new address
             self.iv = iv()
             self.privateKey = generateDSAKey()
-            self.privateKey.x = encrypt_AES(bytes.fromhex(AES_Key), intToBytes(self.privateKey.x), self.iv)
+            self.privateKey.x = encrypt_AES(AES_Key, intToBytes(self.privateKey.x), self.iv)
             self.publicKey = self.privateKey.publickey()
-            self.address = self.hash()
+            self.address = self.hash() # TODO Not good
+            self.recordAddress()
         else:   #Load an existing address
             self.address = addr
-            #Check private and public key in DB
-            #Private key is still encrypt in the DB with AES
+            key, key_pr = self.loadKey()
+            self.privateKey = buildDSAKey(key, key_pr)
+            self.publicKey = self.privateKey.publickey()
+
 
     def signature(self, m):
         k = random.randint(2, self.publicKey.q - 1)
         return self.privateKey.sign()
+
+    def loadKey(self):
+        """Load the public / private key from the DB
+           The private key is still encrypt with AES in the DB
+        """
+        conn = sqlite3.connect('client.db')
+        cursor = conn.cursor()
+        #, pkey_g, pkey_p, pkey_q, prkey_x
+        cursor.execute("""SELECT pkey_y, pkey_g, pkey_p, pkey_q, prkey_x FROM addresses WHERE address=?""", (self.address,))
+        keys = cursor.fetchone()
+        key = (int(keys[0]),int(keys[1]),int(keys[2]),int(keys[3]))
+        conn.close()
+        return key, keys[4]
+
+    def recordAddress(self):
+        """Write the actual key and address on the DB
+           Change the previous "actual address" to an "old address"
+        """
+        conn = sqlite3.connect('client.db')
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO addresses(address,pkey_y,pkey_g,pkey_p,pkey_q,prkey_x) VALUES(?,?,?,?,?,?)""",\
+                        (self.address, str(self.privateKey.y), str(self.privateKey.g), str(self.privateKey.p), str(self.privateKey.q), self.privateKey.x))
+        conn.commit()
+        conn.close()
 
     def hash(self):
         """Create a hash with the Public Key to make an adress
@@ -37,3 +64,24 @@ class Address(object):
         h.update(str(self.publicKey.p).encode('utf-8'))
         h.update(str(self.publicKey.q).encode('utf-8'))
         return h.hexdigest()
+
+
+if __name__ == '__main__':
+    password = "veryGoodPassword"
+    key = sha_256(password)[:32].encode('utf-8')
+    mess = "bonjour"
+    #iv = iv()
+
+    a = Address(AES_Key=key)
+    addr = a.address
+    print(a.privateKey.p)
+    print(a.privateKey.x)
+    a = Address(addr=addr)
+    print(a.privateKey.p)
+    print(a.privateKey.x)
+
+"""
+    c = encrypt_AES(key,mess,iv)
+    e = decrypt_AES(key,c,iv)
+    print(e.decode('utf-8'))
+"""
