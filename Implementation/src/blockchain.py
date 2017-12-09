@@ -6,12 +6,13 @@ conn = sqlite3.connect("Blockchain.db")
 
 conn.execute("""
 CREATE TABLE IF NOT EXISTS Blockchain_blocks (
-    hash_of_previous_block CHAR(256) PRIMARY KEY, # pas sur exactement de quel longeur est le digest 
-    transactions CHAR(50), # Je sais pas quel longeur ont les transactions
+    hash_of_previous_block CHAR(256) PRIMARY KEY,
+    transactions CHAR(50),
     proof_of_work INTEGER DEFAULT NULL,
     difficulty INTEGER DEFAULT NULL,
 );
 """)
+#Pas sur de la longeur du digest ni de la longeur d'une transaction, on pourrait optimiser ça
 
 conn.execute("""
 CREATE TABLE IF NOT EXISTS Blockchain_address (
