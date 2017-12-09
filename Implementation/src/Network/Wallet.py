@@ -15,12 +15,12 @@ IP_RELAY = [
 ]
 """
 	MAN
-		to submit a transactio to the relay node
+		to submit a transaction to the relay node
 			call postTransaction(trans) 
 				where trans is a Transaction object
 				return the ID of the ransaction
 
-		to get a transactio to the relay node
+		to get a transaction to the relay node
 			call getTransaction(ID) 
 				where ID is the id of the transaction object
 				return an array with the id and a Transactionobject

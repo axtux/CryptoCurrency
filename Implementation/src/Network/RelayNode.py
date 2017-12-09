@@ -22,6 +22,11 @@ MASTER_URL = 'http://127.0.20.1:8081'
 				getBlock()
 				processBlock(block)
 
+		for relay node to master
+			to optain blockchain:  (see doTest)
+				getBlock()
+				processBlock(block)
+
 
 
 """
@@ -59,14 +64,28 @@ def processBlock(block):
 
 
 
-### INTERNAT STUFF ##
+### PUlic Method ##
 
 
 
 # Obtain a copy of the blockchain
 def getBlockchain():
-	data = False
-	r = requests.get(MASTER_URL+"/blockchain")
+	str = doGetBlockchain()
+	array = json.loads(str)
+	return [Block.fromJson(v) for v in array]
+	 
+	 
+# submit a block
+def submitBlock(block):
+	return doSubmitBlockchain(block.toJson())
+
+
+
+### INTERNAT STUFF ##
+
+# Obtain a copy of the blockchain
+def doGetBlockchain():
+	r = requests.get(MASTER_URL+"/blockchain/")
 	
 	if r.status_code==200:
 		return r.text
@@ -78,16 +97,13 @@ def getBlockchain():
 # submit a block
 	
 
-def submitBlockchain(data):
-	data = False
+def doSubmitBlockchain(data):
 	r = requests.post(MASTER_URL+"/blockchain/",data=data)
 	
 	if r.status_code==200:
 		return r.text
 	else:
 		raise Exception
-
-
  
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -153,12 +169,15 @@ def run():
 	httpd.serve_forever()
  
  
-run()
+ 
+if __name__ == '__main__':
+    run()
 
 
 
 def doTEST():
-	pass
+	getBlockchain()
+	submitBlock(Block("42"))
 
 
 

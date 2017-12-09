@@ -33,7 +33,6 @@ def getNumber():
 	
 
 def makeGet(server):
-	data = False
 	r = requests.get(server+"/getWork/")
 	print(r.text)
 	
