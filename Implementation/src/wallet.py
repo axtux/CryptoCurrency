@@ -1,4 +1,5 @@
 import random
+from bloackchain import Blockchain
 from utils import sha_256
 import sqlite3
 from address import Address
@@ -15,6 +16,7 @@ class Wallet(object):
         addr    : The current adress of the user
         """
         self.user_ID = user_ID
+        self.bloackChain = self.askCopyChain()
         if addr == None:    #New Wallet : Create the first Address
             self.addr = Address(AES_Key=AES_Key)
             self.defineActualAddress(self.addr)
@@ -22,19 +24,30 @@ class Wallet(object):
             self.addr = Address(addr=addr)
         self.count = self.checkCount()
 
+    def askCopyChain(self):
+        """Ask to the RelayNode a valid copy of the blockchain
+        """
+        # TODO
+        return Blockchain()
+
     def checkCount(self):
         """Check, with the actual address, the Wallet value in the BlockChain
         """
         # TODO Ask to the relay node a copy of the BlockChain
         return 0
 
-    def createTransaction(self, money, to, AES_Key):
+    def createTransaction(self, moneyList, destList, AES_Key):
         """Create a new transaction and send it to the RelayNode
+           moneyList[i] is the value send to the address destList[i]
+           The last transaction is the rest of the wallet send to the new user address
         """
         newAddr = Address(AES_Key=AES_Key)
-        transac = transaction(self.addr, money, to, newAddr)
-        #network.postTransaction(transac)
-        self.defineActualAddress(newAddr)
+        if len(moneyList) == len(destList) and sum(moneyList) <= self.count:
+            moneyList.append(self.count - sum(moneyList))
+            destList.append(newAddr.address)
+            transac = transaction(self.addr, moneyList, toList, newAddr)
+            #network.postTransaction(transac)
+            self.defineActualAddress(newAddr)
 
     def signature(self, m):
         """return the Public Key object and the result of the signature

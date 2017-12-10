@@ -3,6 +3,7 @@ from Crypto.PublicKey import DSA
 from Crypto.Cipher import AES
 from Crypto import Random
 from hashlib import sha256
+from hashlib import new as ripemd160
 import random
 
 
@@ -55,6 +56,19 @@ def sha_256(text):
         for i in text:
             h.update(i.encode('utf-8'))
     return h.hexdigest()
+
+def ripemd_160(text):
+    """hash the content of text
+       text : String or list of String
+    """
+    h = ripemd160('ripemd160')
+    if type(text) == str:
+        h.update(text.encode('utf-8'))
+    else: #type(text) == list
+        for i in text:
+            h.update(i.encode('utf-8'))
+    return h.hexdigest()
+
 
 if __name__ == '__main__':
     """
