@@ -16,7 +16,7 @@ class Miner:
      - send packages of transactions to relmay nodes once they'r good enough
      """
 
-    def __init__(self):
+    def __init__(self, blockchain, address, relay):
         self._transactions = []
         self._mining = 0
         self.wallet = wallet()

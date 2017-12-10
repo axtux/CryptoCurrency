@@ -4,15 +4,16 @@ import json
 from transaction import Transaction
 
 class Block:
-    def __init__(self, previousHash,transactions=[],pow=0,difficulty=0,size=10):
-        self.transactions = transactions
-        self.previousHash = previousHash
-        self.pow = pow    #proofOfWork
-        self.difficulty = difficulty
-        self.size = size  # Can be changed later
-        self.minerAdress=  None
+    DIFFICULTY = 5
+    MAX_TRANSACTIONS = 50
 
-    def addTransaction(transaction):
+    def __init__(self, previous_hash, miner_address, transactions=[]):
+        self.previous_hash = previous_hash
+        self.miner_address = miner_address
+        self.set_transactions(transactions)
+
+    def set_transactions(transaction):
+        # TODO: add transactions and update trasanctions_hash
         if(len(self.transactions) < self.size):
             self.transactions.append(transaction)
         else:
@@ -32,10 +33,15 @@ class Block:
         self.minerAdress=adress
 
     def hash(self, proof):
+        # TODO: hash previous_hash, miner_address, transactions_hash and proof
         self.pow = proof
         h = hashlib.sha256()
         h.update(str(self) + str(proof))
         return h.digest()
+
+    def is_valid():
+        #TODO: check that hash correspond to DIFFICULTY
+        pass
 
     def toJson(self):
         return json.dumps({
