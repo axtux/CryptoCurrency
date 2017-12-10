@@ -12,7 +12,7 @@ class Blockchain:
 	first_hash = sha_256("42")
 
 	def __init__(self):
-		print "Initialising Blockchain\n"
+		print("Initialising Blockchain\n")
 		conn = sqlite3.connect("Blockchain.db")
 		# On cree une DB avec les Blocs
 		conn.execute("""
@@ -45,7 +45,7 @@ class Blockchain:
 		self._last_block = Block(self.first_hash)
 		self.add_block(self._last_block)
 		self._last_hash = sha_256(str(self._last_block))
-		print "Finished initialising blockchain\n"
+		print("Finished initialising blockchain\n")
 
 	def __repr__(self):
 		# On represente les blocs en partant du bloc 0
@@ -63,7 +63,7 @@ class Blockchain:
 
 	def __del__(self):
 		# On detruit la base de donnee un fois qu'on detruit la blockchain
-		print "destroying de DB"
+		print("destroying de DB")
 		conn = sqlite3.connect("Blockchain.db")
 		cursor = conn.cursor()
 		cursor.execute("""
@@ -77,7 +77,7 @@ class Blockchain:
 		""")
 		conn.commit()
 		conn.close()
-		print "destroyed"
+		print("destroyed")
 
 	def get_last_block(self):
 		return self._last_block
@@ -154,19 +154,19 @@ def print_Blockchain_blocks():
 	cursor.execute("SELECT hash_of_previous_block, proof_of_work , difficulty FROM Blockchain_blocks")
 	rows = cursor.fetchall()
 	for row in rows:
-		print "block:"
-		print row[0]
-		print row[1]
-		print row[2]
+		print("block:")
+		print(row[0])
+		print(row[1])
+		print(row[2])
 		cursor.execute("SELECT hash_of_previous_block, id , amount , sender, receiver FROM Blockchain_transactions WHERE hash_of_previous_block=?", (row[0],))
 		transactions = cursor.fetchall()
 		for transaction in transactions:
-			print "transaction:"
-			print transaction[1]
-			print transaction[2]
-			print transaction[3]
-			print transaction[4]
-			print "\n"
+			print("transaction:")
+			print(transaction[1])
+			print(transaction[2])
+			print(transaction[3])
+			print(transaction[4])
+			print("\n")
 	conn.commit()
 	conn.close()
 
@@ -180,13 +180,13 @@ def print_Blockchain_address():
 			temp = "This address has not been used"
 		else:
 			temp = "This address has been used"
-		print "address " + str(row[0]) + " has amount " + str(row[1]) + ". " + temp
+		print("address " + str(row[0]) + " has amount " + str(row[1]) + ". " + temp)
 	conn.commit()
 	conn.close()
 
 if __name__ == '__main__':
 	
-	print "NEW TEST:\n"
+	print("NEW TEST:\n")
 	blockchain = Blockchain()
 	previousHash = blockchain.get_last_hash()
 	transaction_1 = Transaction(123, "A", "B")
@@ -194,14 +194,14 @@ if __name__ == '__main__':
 	transactions = [transaction_1, transaction_2]
 	block = Block(previousHash, transactions)
 	blockchain.add_block(block)
-	print "printing blockchain\n" + str(blockchain)
-	print "printing address list"
+	print("printing blockchain\n" + str(blockchain))
+	print("printing address list")
 	print_Blockchain_address()
-	print "finished printing address list"
+	print("finished printing address list")
 
 
 
-	print "\n\n\n\n\n"
+	print("\n\n\n\n\n")
 	previousHash = blockchain.get_last_hash()
 	transaction_1 = Transaction(322, "A", "B")
 	transaction_2 = Transaction(234324, "Z", "T")
@@ -209,10 +209,10 @@ if __name__ == '__main__':
 	block2 = Block(previousHash, transactions)
 
 	blockchain.add_block(block2)
-	print blockchain
-	print "printing adresses"
+	print(blockchain)
+	print("printing adresses")
 	print_Blockchain_address()
 
-	print blockchain.get_amount_of_address("A")
-	print blockchain.get_last_hash()
-	print sha_256(str(block2))
+	print(blockchain.get_amount_of_address("A"))
+	print(blockchain.get_last_hash())
+	print(sha_256(str(block2)))
