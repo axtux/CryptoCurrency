@@ -4,7 +4,7 @@ from transactions import Transaction
 import sqlite3 
 
 
-""" Toutes cettes classe se base sur le fait que toutes les transactions que l'on veut faire sont effectivement correcte.
+""" Toutes cette classe se base sur le fait que toutes les transactions que l'on veut faire sont effectivement correcte.
 Je peut rajouter un controle en plus si il faut"""
 
 class Blockchain:
@@ -12,10 +12,10 @@ class Blockchain:
     first_hash = sha_256("42")
 
     def __init__(self):
-        print("Initialising Blockchain\n")
-        conn = sqlite3.connect("Blockchain.db")
+        self.conn = sqlite3.connect("Blockchain.db")
+        self.cursor = self.conn.cursor()
         # On cree une DB avec les Blocs
-        conn.execute("""
+        self.conn.execute("""
             CREATE TABLE IF NOT EXISTS Blockchain_blocks (
             hash_of_previous_block TEXT PRIMARY KEY DEFAULT NULL,
             proof_of_work INTEGER DEFAULT NULL,
@@ -23,7 +23,7 @@ class Blockchain:
         );""")
 
         # On cree une DB avec les transactions qui appartiennent a chaque bloc comme dans SQLite on ne peut avoir des valeurs qui sont des listes
-        conn.execute("""
+        self.conn.execute("""
             CREATE TABLE IF NOT EXISTS Blockchain_transactions(
             hash_of_previous_block TEXT DEFAULT NULL,
             id INTEGER DEFAULT NULL,
@@ -34,17 +34,16 @@ class Blockchain:
         );""")
 
         # On cree la DB avec les adresses et l'argent du compte
-        conn.execute("""
+        self.conn.execute("""
             CREATE TABLE IF NOT EXISTS Blockchain_address (
             address TEXT PRIMARY KEY DEFAULT NULL,
             money_of_address TEXT DEFAULT NULL,
             flag BOOLEAN DEFAULT NULL
         );""")
-        conn.commit()
-        conn.close()
-        self._last_block = Block(self.first_hash)
-        self.add_block(self._last_block)
-        self._last_hash = sha_256(str(self._last_block))
+        if Blockchain.count == 0:
+            self._last_block = Block(self.first_hash)
+            self.add_block(self._last_block)
+            self._last_hash = sha_256(str(self._last_block))
         print("Finished initialising blockchain\n")
 
     def __repr__(self):
@@ -64,20 +63,33 @@ class Blockchain:
     def __del__(self):
         # On detruit la base de donnee un fois qu'on detruit la blockchain
         print("destroying de DB")
-        conn = sqlite3.connect("Blockchain.db")
-        cursor = conn.cursor()
-        cursor.execute("""
+        self.cursor.execute("""
             DROP TABLE Blockchain_blocks
         """)
-        cursor.execute("""
+        self.cursor.execute("""
             DROP TABLE Blockchain_address
         """)
-        conn.execute("""
+        self.conn.execute("""
             DROP TABLE Blockchain_transactions
         """)
-        conn.commit()
-        conn.close()
+        self.conn.commit()
         print("destroyed")
+
+    def write_in_blocks_DB(self, previousHash, proof_of_work, difficulty):
+        self.cursor.execute("INSERT INTO Blockchain_blocks (hash_of_previous_block, proof_of_work, difficulty) VALUES (?, ?, ?)", (previousHash, proof_of_work, difficulty));
+        self.conn.commit()
+
+    def write_in_address_DB(self, address, money_of_address, flag):
+        self.cursor.execute("INSERT INTO Blockchain_address (address, money_of_address, flag) VALUES (?, ?, ?)", (address, money_of_address, flag));
+        self.conn.commit()
+
+    def write_in_transactions_DB(self, previousHash, index, amount, sender, receiver):
+        self.cursor.execute("INSERT INTO Blockchain_transactions (hash_of_previous_block, id, amount, sender, receiver) VALUES (?, ?, ?, ?, ?)", (previousHash, index, amount, sender, receiver));
+        self.conn.commit()
+
+    def select_address(self, address):
+        self.cursor.execute("SELECT address, money_of_address, flag FROM Blockchain_address WHERE address=?", (address))
+        return self.cursor.fetchone()
 
     def get_last_block(self):
         return self._last_block
@@ -86,80 +98,67 @@ class Blockchain:
         return self._last_hash
 
     def get_amount_of_address(self, address):
-        conn = sqlite3.connect("Blockchain.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT money_of_address FROM Blockchain_address WHERE address = ?", (address))
-        amount = cursor.fetchone()
-        conn.commit()
-        conn.close()
+        self.cursor.execute("SELECT money_of_address FROM Blockchain_address WHERE address = ?", (address))
+        amount = self.cursor.fetchone()
+        self.conn.commit()
         return int(amount[0])
 
     def add_block(self, block):
         Blockchain.count += 1
-        conn = sqlite3.connect("Blockchain.db")
-        cursor = conn.cursor()
         # On update le dernier block et le hash du dernier bloc
         self._last_block = block
         self._last_hash = sha_256(str(self._last_block))
         # on rajoute le bloc dans la DB contenant tout les blocs
-        cursor.execute("INSERT INTO Blockchain_blocks (hash_of_previous_block, proof_of_work, difficulty) VALUES (?, ?, ?)", (block.previousHash, block.pow, block.difficulty));
+        self.write_in_blocks_DB(block.previousHash, block.pow, block.difficulty)
         for i in range(len(block.transactions)):
             # Pour chaque transaction, on la rajoute dans la DB des transactions
-            cursor.execute("INSERT INTO Blockchain_transactions (hash_of_previous_block, id, amount, sender, receiver) VALUES (?, ?, ?, ?, ?)", (block.previousHash, i, block.transactions[i].amount, block.transactions[i].sender, block.transactions[i].receiver));
-            cursor.execute("SELECT address, money_of_address, flag FROM Blockchain_address WHERE address=?", (block.transactions[i].receiver,))
-            temp = cursor.fetchone()
+            self.write_in_transactions_DB(block.previousHash, i, block.transactions[i].amount, block.transactions[i].sender, block.transactions[i].receiver);
+            temp = self.select_address(block.transactions[i].receiver)
             if temp == None:
                 # On cherche si l'addresse a deja ete utilise pour recevoir. Si non on la rajoute
-                cursor.execute("INSERT INTO Blockchain_address (address, money_of_address, flag) VALUES (?, ?, ?)", (block.transactions[i].receiver, block.transactions[i].amount, False));
+                self.write_in_address_DB(block.transactions[i].receiver, block.transactions[i].amount, False);
             else:
                 # Si oui on update son argent
                 temp_amount = int(temp[1]) + block.transactions[i].amount
-                cursor.execute("UPDATE Blockchain_address SET money_of_address = ? WHERE address = ?", (temp_amount, block.transactions[i].receiver))
-            cursor.execute("SELECT address, money_of_address, flag FROM Blockchain_address WHERE address=?", (block.transactions[i].sender,))
-            temp = cursor.fetchone()
+                self.cursor.execute("UPDATE Blockchain_address SET money_of_address = ? WHERE address = ?", (temp_amount, block.transactions[i].receiver))
+            temp = self.select_address(block.transactions[i].sender)
             if temp == None:
                 # On cherche si l'addresse d'envoi existe deja. Si non on la rajoute et on met le bon flag
-                cursor.execute("INSERT INTO Blockchain_address (address, money_of_address, flag) VALUES (?, ?, ?)", (block.transactions[i].sender, block.transactions[i].amount, True));
+                self.write_in_address_DB(block.transactions[i].sender, block.transactions[i].amount, True);
             else:
                 # Si oui, on update la valeur et on met le bon flag
                 temp_amount = int(temp[1]) - block.transactions[i].amount
-                cursor.execute("UPDATE Blockchain_address SET money_of_address = ? WHERE address = ?", (temp_amount, block.transactions[i].sender))
-                cursor.execute("UPDATE Blockchain_address SET flag = ? where address = ?", (True, block.transactions[i].sender));
-        conn.commit()
-        conn.close()
+                self.cursor.execute("UPDATE Blockchain_address SET money_of_address = ? WHERE address = ?", (temp_amount, block.transactions[i].sender))
+                self.cursor.execute("UPDATE Blockchain_address SET flag = ? where address = ?", (True, block.transactions[i].sender));
+        self.conn.commit()
 
     def get_next_block(self, hash_):
-        conn = sqlite3.connect("Blockchain.db")
         identifier = hash_
-        cursor = conn.cursor()
         # On extrait les donnees du bloc qui sont dans la DB avec les blocs
-        cursor.execute("SELECT hash_of_previous_block, id , amount, sender, receiver FROM Blockchain_transactions WHERE hash_of_previous_block=?", (identifier,))
-        transactions = cursor.fetchall()
+        self.cursor.execute("SELECT hash_of_previous_block, id , amount, sender, receiver FROM Blockchain_transactions WHERE hash_of_previous_block=?", (identifier,))
+        transactions = self.cursor.fetchall()
         transactions_list = []
         # Pour chaque bloc on extrait les transactions dans la DB des transactions
         for transaction in transactions:
             transaction = Transaction(transaction[2], transaction[3], transaction[4])
             transactions_list.append(transaction)
-        cursor.execute("SELECT hash_of_previous_block, proof_of_work , difficulty FROM Blockchain_blocks WHERE hash_of_previous_block=?", (identifier,))
-        response = cursor.fetchone()
+        self.cursor.execute("SELECT hash_of_previous_block, proof_of_work , difficulty FROM Blockchain_blocks WHERE hash_of_previous_block=?", (identifier,))
+        response = self.cursor.fetchone()
         # On recree le bloc et on l'envoi
         block = Block(response[0], transactions_list, response[1], response[2])
-        conn.commit()
-        conn.close()
+        self.conn.commit()
         return block
 
 def print_Blockchain_blocks():
-    conn = sqlite3.connect("Blockchain.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT hash_of_previous_block, proof_of_work , difficulty FROM Blockchain_blocks")
-    rows = cursor.fetchall()
+    self.cursor.execute("SELECT hash_of_previous_block, proof_of_work , difficulty FROM Blockchain_blocks")
+    rows = self.cursor.fetchall()
     for row in rows:
         print("block:")
         print(row[0])
         print(row[1])
         print(row[2])
-        cursor.execute("SELECT hash_of_previous_block, id , amount , sender, receiver FROM Blockchain_transactions WHERE hash_of_previous_block=?", (row[0],))
-        transactions = cursor.fetchall()
+        self.cursor.execute("SELECT hash_of_previous_block, id , amount , sender, receiver FROM Blockchain_transactions WHERE hash_of_previous_block=?", (row[0],))
+        transactions = self.cursor.fetchall()
         for transaction in transactions:
             print("transaction:")
             print(transaction[1])
@@ -167,22 +166,18 @@ def print_Blockchain_blocks():
             print(transaction[3])
             print(transaction[4])
             print("\n")
-    conn.commit()
-    conn.close()
+    self.conn.commit()
 
-def print_Blockchain_address():
-    conn = sqlite3.connect("Blockchain.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT address, money_of_address , flag FROM Blockchain_address")
-    rows = cursor.fetchall()
+def print_Blockchain_address(blockchain):
+    blockchain.cursor.execute("SELECT address, money_of_address , flag FROM Blockchain_address")
+    rows = blockchain.cursor.fetchall()
     for row in rows:
         if bool(row[2]) == False:
             temp = "This address has not been used"
         else:
             temp = "This address has been used"
         print("address " + str(row[0]) + " has amount " + str(row[1]) + ". " + temp)
-    conn.commit()
-    conn.close()
+    blockchain.conn.commit()
 
 if __name__ == '__main__':
     
@@ -196,8 +191,9 @@ if __name__ == '__main__':
     blockchain.add_block(block)
     print("printing blockchain\n" + str(blockchain))
     print("printing address list")
-    print_Blockchain_address()
+    print_Blockchain_address(blockchain)
     print("finished printing address list")
+
 
 
     print("\n\n\n\n\n")
@@ -210,7 +206,7 @@ if __name__ == '__main__':
     blockchain.add_block(block2)
     print(blockchain)
     print("printing adresses")
-    print_Blockchain_address()
+    print_Blockchain_address(blockchain)
 
     print(blockchain.get_amount_of_address("A"))
     print(blockchain.get_last_hash())
