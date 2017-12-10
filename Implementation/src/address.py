@@ -35,7 +35,6 @@ class Address(object):
         """
         conn = sqlite3.connect('client.db')
         cursor = conn.cursor()
-        #, pkey_g, pkey_p, pkey_q, prkey_x
         cursor.execute("""SELECT pkey_y, pkey_g, pkey_p, pkey_q, prkey_x FROM addresses WHERE address=?""", (self.address,))
         keys = cursor.fetchone()
         key = (int(keys[0]),int(keys[1]),int(keys[2]),int(keys[3]))
@@ -74,11 +73,18 @@ if __name__ == '__main__':
 
     a = Address(AES_Key=key)
     addr = a.address
+    print(a.privateKey.y)
+    print(a.privateKey.g)
     print(a.privateKey.p)
+    print(a.privateKey.q)
     print(a.privateKey.x)
-    a = Address(addr=addr)
-    print(a.privateKey.p)
-    print(a.privateKey.x)
+    b = Address(addr=addr)
+    print("------")
+    print(a.privateKey.y == b.privateKey.y)
+    print(a.privateKey.g == b.privateKey.g)
+    print(a.privateKey.p == b.privateKey.p)
+    print(a.privateKey.q == b.privateKey.q)
+    print(a.privateKey.x == b.privateKey.x)
 
 """
     c = encrypt_AES(key,mess,iv)
