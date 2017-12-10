@@ -60,21 +60,6 @@ class Blockchain:
             hash_temp = sha_256(str(next_block))
         return temp + "\n"
 
-    def __del__(self):
-        # On detruit la base de donnee un fois qu'on detruit la blockchain
-        print("destroying de DB")
-        self.cursor.execute("""
-            DROP TABLE Blockchain_blocks
-        """)
-        self.cursor.execute("""
-            DROP TABLE Blockchain_address
-        """)
-        self.conn.execute("""
-            DROP TABLE Blockchain_transactions
-        """)
-        self.conn.commit()
-        print("destroyed")
-
     def write_in_blocks_DB(self, previousHash, proof_of_work, difficulty):
         self.cursor.execute("INSERT INTO Blockchain_blocks (hash_of_previous_block, proof_of_work, difficulty) VALUES (?, ?, ?)", (previousHash, proof_of_work, difficulty));
         self.conn.commit()
@@ -211,3 +196,18 @@ if __name__ == '__main__':
     print(blockchain.get_amount_of_address("A"))
     print(blockchain.get_last_hash())
     print(sha_256(str(block2)))
+
+    
+    # On detruit la base de donnee un fois qu'on detruit la blockchain
+    print("destroying de DB")
+    self.cursor.execute("""
+        DROP TABLE Blockchain_blocks
+    """)
+    self.cursor.execute("""
+        DROP TABLE Blockchain_address
+    """)
+    self.conn.execute("""
+        DROP TABLE Blockchain_transactions
+    """)
+    self.conn.commit()
+    print("destroyed")
