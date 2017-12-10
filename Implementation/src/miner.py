@@ -1,9 +1,10 @@
 import itertools  # List permutation methods
 import utils
-import bloc
+import block
 import wallet  # Crypto methods
 import Network.Miner
 import random
+import blockChain
 class Miner:
     """A Miner gives the proof of work to give the first step of confirmation for a transaction
     Miners contain
@@ -15,46 +16,54 @@ class Miner:
      - mine them
      - send packages of transactions to relmay nodes once they'r good enough
      """
+     FLAG=10 #number of iteration of mining before check if the block has been found
 
     def __init__(self, blockchain, address, relay):
-        self._transactions = []
-        self._mining = 0
-        self.wallet = wallet()
-        self.bloc = Miner.getWork()
+        self.blockChain = blockChain
+        self.adress = address
+        self.relay = relay
+        self.flag=0
+
+    def create_block(self):
+        self.block= Block(self.blockChain.get_last_block().hash(),self.adress,self.get_ordered_transactions())
+
+    def get_ordered_transactions(self):
+        return self.relay.get_transactions()
 
     def run(self,strategy):
-        testBloc= Miner.getWork()
-        if (self.bloc.__eq__(testBloc)): #Test if the bloc has not been found by other miner
-            hash=self.mine(strategy)
-            if(self.isBlocValid()):
-                #submitBloc
-        else:
-            self.bloc=test.bloc
+        self.create_block()
+        while(1):
+            if(self.flag == 0):
+                self.flag = FLAG
+                new_blockchain = self.relay.getBlockchain()
+                if not (new_blockchain.get_last_block().hash()==self.blockChain.get_last_block().hash()): # New block has been found
+                    self.blockchain = self.relay.getBlockchain()
+                    self.create_block()
+            else:
+                self.flag = self.flag - 1
+                self.mine(strategy)
+                if(self.block.is_valid()):
+                    self.relay.submitBlock(self.block)
+                    self.flag = 0 #Need to take new transactions
+
 
 
 
      def mine(self,strategy):
-        digest = self.bloc.hash(strategy(self.bloc.pow))
-        return digest
+        digest = self.block.hash(strategy(self.bloc.pow))
 
-    def isBlocValid(self):
-        check = True
-        digest = self.bloc.hash(self.bloc.pow)
-        for (i in range(0, self.bloc.difficulty)):
-            if not digest[i] == "0" :
-                check = False
-        return check
+
 
     def submitTransactions():
         """Gives transactions in order that gives good value to a relay node
         """
         pass
 
-    def increasepow(self,previousPow):
+    def increasepow(self,previousPow=0):
         return previousPow+1
 
-    def decreasepow(self, previousPow):
+    def decreasepow(self, previousPow=2**256):
         return previousPow-1
 
-    def randompow(self,previousPow):
+    def randompow(self,previousPow=0):
         return random.randint(0,2**256)
