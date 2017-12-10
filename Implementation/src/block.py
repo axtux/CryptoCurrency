@@ -10,6 +10,7 @@ class Block:
         self.pow = pow    #proofOfWork
         self.difficulty = difficulty
         self.size = size  # Can be changed later
+        self.minerAdress=  None
 
     def addTransaction(transaction):
         if(len(self.transactions) < self.size):
@@ -23,6 +24,12 @@ class Block:
         for t in self.transactions:
             tmp = tmp + str(i)
         return tmp
+
+    def __eq__(self,otherBloc):
+        return self.__str__() == otherBloc.__str__()
+
+    def setMinerAdress(self,adress):
+        self.minerAdress=adress
 
     def hash(self, proof):
         self.pow = proof
