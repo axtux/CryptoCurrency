@@ -2,7 +2,8 @@ import itertools  # List permutation methods
 import utils
 import bloc
 import wallet  # Crypto methods
-
+import Network.Miner
+import random
 class Miner:
     """A Miner gives the proof of work to give the first step of confirmation for a transaction
     Miners contain
@@ -19,17 +20,21 @@ class Miner:
         self._transactions = []
         self._mining = 0
         self.wallet = wallet()
-        self.bloc = bloc()
+        self.bloc = Miner.getWork()
 
-    def act(self):
-        #TODO check if new transaction with relay node
-        mine()
-        if(isBlocValid()):
-            #TODO send bloc to relay node
-            pass
+    def run(self,strategy):
+        testBloc= Miner.getWork()
+        if (self.bloc.__eq__(testBloc)): #Test if the bloc has not been found by other miner
+            hash=self.mine(strategy)
+            if(self.isBlocValid()):
+                #submitBloc
+        else:
+            self.bloc=test.bloc
 
-     def mine(self):
-        digest = self.bloc.hash(self.bloc.pow + 1)
+
+
+     def mine(self,strategy):
+        digest = self.bloc.hash(strategy(self.bloc.pow))
         return digest
 
     def isBlocValid(self):
@@ -44,3 +49,12 @@ class Miner:
         """Gives transactions in order that gives good value to a relay node
         """
         pass
+
+    def increasepow(self,previousPow):
+        return previousPow+1
+
+    def decreasepow(self, previousPow):
+        return previousPow-1
+
+    def randompow(self,previousPow):
+        return random.randint(0,2**256)
