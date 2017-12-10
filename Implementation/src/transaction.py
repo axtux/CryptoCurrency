@@ -2,10 +2,9 @@ import json
 
 
 class Transaction(object):
-    def __init__(self, sender, amount, receiver):
+    def __init__(self, sender_public_key, receivers):
         self.sender = sender
-        self.amount = amount
-        self.receiver = receiver
+        self.receivers = receivers
 
     def toJson(self):
         return json.dumps({
@@ -13,6 +12,12 @@ class Transaction(object):
                 "amount":self.amount,
                 "receiver":self.receiver,
             })
+
+    def sign(self, private_key):
+        pass
+
+    def is_signed():
+        pass
 
     @staticmethod
     def fromJson(data):
