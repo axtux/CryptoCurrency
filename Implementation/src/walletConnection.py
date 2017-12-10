@@ -19,13 +19,14 @@ class Connection(object):
         newWallet   : True to create a new wallet with these information
                       False to connecte to user to his Wallet
         """
+        hashPass = sha_256(password)
         if newWallet:
-            if self.newUser(id, sha_256(password)[:8] + sha_256(password)[24:]):
-                return Wallet(AES_Key=sha_256(password)[8:24])
+            if self.newUser(id, hashPass[:16] + hashPass[48:]):
+                return Wallet(id, AES_Key=hashPass[16:48])
         else:
-            addr = self.userExist(id, sha_256(password)[:8] + sha_256(password)[24:])
+            addr = self.userExist(id, hashPass[:16] + hashPass[48:])
             if addr:
-                return Wallet(addr=addr)
+                return Wallet(id, addr=addr)
         return None
 
     def userExist(self, id, hashPassword):
@@ -50,8 +51,7 @@ class Connection(object):
         conn = sqlite3.connect('client.db')
         cursor = conn.cursor()
         try:
-            cursor.execute("""INSERT INTO users(ID, hashPass) VALUES(?, ?)""", (id, hashPassword))
-            cursor.execute("""SELECT * FROM users""")
+            cursor.execute("""INSERT INTO users(ID, hashPass, actualAddress) VALUES(?, ?, ?)""", (id, hashPassword, ""))
             conn.commit()
         except sqlite3.IntegrityError:
             ret = False
@@ -59,15 +59,11 @@ class Connection(object):
             conn.close()
             return ret
 
-    def addrList(self, id):
-        """Return a list of Address object with all address of the user in the DB
-        """
-        return []
-
 
 
 if __name__ == '__main__':
     password = "veryGoodPassword"
-    print(sha_256(password).encode('utf-8'))
-    print(len(sha_256(password)))
-    print(sha_256(password)[:8] + sha_256(password)[24:])
+    conn = Connection()
+    w = conn.allowConnection("prout",password)
+    a = Address(addr="12")
+    w.defineActualAddress(a)

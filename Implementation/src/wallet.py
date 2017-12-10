@@ -1,5 +1,7 @@
 import random
-import utils
+from bloackchain import Blockchain
+from utils import sha_256
+import sqlite3
 from address import Address
 
 class Wallet(object):
@@ -7,32 +9,45 @@ class Wallet(object):
     Wallet have money and can create some Transaction to send money to an another Wallet
     """
 
-    def __init__(self, AES_Key=None, addr=None):
+    def __init__(self, user_ID, AES_Key=None, addr=None):
         """Create a new wallet
 
-        AES_key : The AES from the user using to encrypt / decrypt his private key
-            If the AES_Key was not correct, the private key will not be correct and not be able to sign a transaction
-        addr    : The current adress from the user
-            If the addr was not correct, the AES_Key will not be able to sign a transaction
+        AES_key : The AES key of the user using to encrypt / decrypt his private key
+        addr    : The current adress of the user
         """
+        self.user_ID = user_ID
+        self.bloackChain = self.askCopyChain()
         if addr == None:    #New Wallet : Create the first Address
-            self.addrList = [Address(AES_Key)]
+            self.addr = Address(AES_Key=AES_Key)
+            self.defineActualAddress(self.addr)
         else:
-            self.addrList = addr    #The principal address is the first (index 0)
+            self.addr = Address(addr=addr)
         self.count = self.checkCount()
 
-    def checkCount(self):
-        """Check, with the actul address, the Wallet value in the BlockChain
+    def askCopyChain(self):
+        """Ask to the RelayNode a valid copy of the blockchain
         """
+        # TODO
+        return Blockchain()
+
+    def checkCount(self):
+        """Check, with the actual address, the Wallet value in the BlockChain
+        """
+        # TODO Ask to the relay node a copy of the BlockChain
         return 0
 
-    def createTransaction(self, money, to):
-        """Create a new transaction to send it to the RelayNode
+    def createTransaction(self, moneyList, destList, AES_Key):
+        """Create a new transaction and send it to the RelayNode
+           moneyList[i] is the value send to the address destList[i]
+           The last transaction is the rest of the wallet send to the new user address
         """
-        transac = transaction(self.actualKey, money, to)
-        self.oldKey.append(self.actualKey)
-        # TODO: create new address
-        return None
+        newAddr = Address(AES_Key=AES_Key)
+        if len(moneyList) == len(destList) and sum(moneyList) <= self.count:
+            moneyList.append(self.count - sum(moneyList))
+            destList.append(newAddr.address)
+            transac = transaction(self.addr, moneyList, toList, newAddr)
+            #network.postTransaction(transac)
+            self.defineActualAddress(newAddr)
 
     def signature(self, m):
         """return the Public Key object and the result of the signature
@@ -41,6 +56,16 @@ class Wallet(object):
         """
         return self.actualKey.publicKey, self.actualKey.signature(m)
 
+    def defineActualAddress(self, newAddr):
+        """Define the newAddr as the actual address of the user
+           Change it in the DB
+        """
+        conn = sqlite3.connect('client.db')
+        cursor = conn.cursor()
+        cursor.execute("""UPDATE users SET actualAddress=? WHERE ID=?""", (newAddr.address, self.user_ID))
+        conn.commit()
+        conn.close()
+        self.addr = newAddr
 
 if __name__ == '__main__':
     """
@@ -55,3 +80,11 @@ if __name__ == '__main__':
     print("-----")
     print(k.address)
     """
+    password = "veryGoodPassword"
+    print(sha_256(password)[:32])
+
+    w = Wallet(AES_Key=sha_256(password)[:32])
+    print(w.addr)
+    newAddr = Address()
+    w.defineActualAddress(newAddr)
+    print(w.addr)

@@ -2,7 +2,7 @@ import math
 import random
 from hashlib import sha256
 from Crypto import Random
-from utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, sha_256
+from utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, ripemd_160
 import sqlite3
 
 class Address(object):
@@ -16,7 +16,7 @@ class Address(object):
             self.privateKey = generateDSAKey()
             self.privateKey.x = encrypt_AES(AES_Key, intToBytes(self.privateKey.x), self.iv)
             self.publicKey = self.privateKey.publickey()
-            self.address = self.hash() # TODO Not good
+            self.address = self.generateAddress()
             self.recordAddress()
         else:   #Load an existing address
             self.address = addr
@@ -35,7 +35,6 @@ class Address(object):
         """
         conn = sqlite3.connect('client.db')
         cursor = conn.cursor()
-        #, pkey_g, pkey_p, pkey_q, prkey_x
         cursor.execute("""SELECT pkey_y, pkey_g, pkey_p, pkey_q, prkey_x FROM addresses WHERE address=?""", (self.address,))
         keys = cursor.fetchone()
         key = (int(keys[0]),int(keys[1]),int(keys[2]),int(keys[3]))
@@ -53,17 +52,10 @@ class Address(object):
         conn.commit()
         conn.close()
 
-    def hash(self):
+    def generateAddress(self):
         """Create a hash with the Public Key to make an adress
-        The update function from hashlib add a string ton a list
-        The hexdigest function from hashlib hash all the data send with update and return it in hexadecimal
         """
-        h = sha256()
-        h.update(str(self.publicKey.y).encode('utf-8'))
-        h.update(str(self.publicKey.g).encode('utf-8'))
-        h.update(str(self.publicKey.p).encode('utf-8'))
-        h.update(str(self.publicKey.q).encode('utf-8'))
-        return h.hexdigest()
+        return ripemd_160([self.publicKey.y,self.publicKey.gself.publicKey.p,self.publicKey.q])
 
 
 if __name__ == '__main__':
@@ -74,11 +66,18 @@ if __name__ == '__main__':
 
     a = Address(AES_Key=key)
     addr = a.address
+    print(a.privateKey.y)
+    print(a.privateKey.g)
     print(a.privateKey.p)
+    print(a.privateKey.q)
     print(a.privateKey.x)
-    a = Address(addr=addr)
-    print(a.privateKey.p)
-    print(a.privateKey.x)
+    b = Address(addr=addr)
+    print("------")
+    print(a.privateKey.y == b.privateKey.y)
+    print(a.privateKey.g == b.privateKey.g)
+    print(a.privateKey.p == b.privateKey.p)
+    print(a.privateKey.q == b.privateKey.q)
+    print(a.privateKey.x == b.privateKey.x)
 
 """
     c = encrypt_AES(key,mess,iv)
