@@ -14,7 +14,7 @@ class Master(object):
 
     def addBlock(self,block) :
         """
-            This function add the block to the queue ( max 100)
+            This function add the block given by the relay node to the queue ( max 100)
         """
         if (len(self.queue)<= 100):
             self.queue.append(block)
@@ -30,6 +30,7 @@ class Master(object):
         for b in self.queue :
             if (correspond(b)) :
                 self.bc.add_block(b)
+                break
         self.queue = [] #we discard the remaining blocks
         return None
 
@@ -37,4 +38,4 @@ class Master(object):
         """
             This function is used to check if the hash of a block correspond with the current block of the blockchain
         """
-        
+            pass
