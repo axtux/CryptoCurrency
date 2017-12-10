@@ -1,21 +1,28 @@
-import utils.py
-import block.py
-import mysql.connector 
+from utils import sha_256
+from block import Block
+import sqlite3 
 
-conn = mysql.connector.connect(host="localhost",user="root",password="XXX", database="Blockchain_blocks")
-cursor = conn.cursor()
-conn.close()
-# Pas sur de ce que je fais, DB et server ça me connais pas
+conn = sqlite3.connect("Blockchain.db")
 
-cursor.execute("""
+conn.execute("""
 CREATE TABLE IF NOT EXISTS Blockchain_blocks (
-    Hash_of_previous_block varchar(256) DEFAULT NULL, # pas sur exactement de quel longeur est le digest 
-    Transactions varchar(50) DEFAULT NULL, # Je sais pas quel longeur ont les transactions
-    Proof_of_work INTEGER DEFAULT NULL,
-    Difficulty INTEGER DEFAULT NULL,
-    PRIMARY KEY(Hash_of_previous_block)
+    hash_of_previous_block CHAR(256) PRIMARY KEY,
+    transactions CHAR(50),
+    proof_of_work INTEGER DEFAULT NULL,
+    difficulty INTEGER DEFAULT NULL
 );
 """)
+#Pas sur de la longeur du digest ni de la longeur d'une transaction, on pourrait optimiser ça
+
+conn.execute("""
+CREATE TABLE IF NOT EXISTS Blockchain_address (
+    address CHAR(256) PRIMARY KEY,
+    money_of_address CHAR(50),
+    flag BOOLEAN
+);
+""")
+
+conn.close()
 
 class Blockchain:
 	count = 0
@@ -32,14 +39,35 @@ class Blockchain:
 		return self._last_hash
 
 	def add_block(self, block):
+		conn = sqlite3.connect("Blockchain.db")
 		self._last_block = block
 		self._last_hash = sha_256(str(self._last_block))
-		block_temp = {"Hash_of_previous_block": str(block.previousHash), "Transactions" : str(block.transactions), "Proof_of_work" : block.pow, "Difficulty" : block.difficulty}
-		cursor.execute("""INSERT INTO Blockchain_blocks (Hash_of_previous_block, Transactions, Proof_of_work, Difficulty) VALUES(%(Hash_of_previous_block)s, %(Transactions)s, %(Proof_of_work)s, %(Difficulty)s)""", block_temp)
+		conn.execute("INSERT INTO Blockchain_blocks (Hash_of_previous_block, Transactions, Proof_of_work, Difficulty) VALUES (block.previousHash, block.transactions, block.pow, block.difficulty)");
+		for i in len(block.transactions):
+			cursor.execute("""SELECT address, money_of_address, flag FROM Blochain_address WHERE address=?""", (block.transactions[i].receiver,))
+			temp = cursor.fetchone()
+			if type(temp) == "NoneType":
+				conn.execute("INSERT INTO Blockchain_address (address, money_of_address, flag) VALUES (block.transactions[i].receiver, block.transactions[i].amount, FALSE)");
+			else:
+				temp_amount = temp[1] + block.transactions[i].amount
+				conn.execute("UPDATE Blockchain_address set money_of_address = temp_amount where address = block.transactions[i].receiver");
+			cursor.execute("""SELECT address, money_of_address, flag FROM Blochain_address WHERE address=?""", (block.transactions[i].sender,))
+			temp = cursor.fetchone()
+			if type(temp) == "NoneType":
+				conn.execute("INSERT INTO Blockchain_address (address, money_of_address, flag) VALUES (block.transactions[i].sender, block.transactions[i].amount, TRUE)");
+			else:
+				temp_amount = temp[1] - block.transactions[i].amount
+				conn.execute("UPDATE Blockchain_address set money_of_address = temp_amount where address = block.transactions[i].sender");
+				conn.execute("UPDATE Blockchain_address set flag = TRUE where address = block.transactions[i].sender");
+		conn.commit()
+		conn.close()
 
-	def get_next_block(self, hash)
+	def get_next_block(self, hash):
+		conn = sqlite3.connect("Blockchain.db")
 		id = hash
 		cursor.execute("""SELECT id, Transactions, Proof_of_work , Difficulty FROM users WHERE id=?""", (id,))
 		response = cursor.fetchone()
 		block = Block(response[0], response[1], response[2], response[3])
+		conn.commit()
+		conn.close()
 		return block

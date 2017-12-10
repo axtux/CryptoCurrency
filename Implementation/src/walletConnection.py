@@ -1,6 +1,7 @@
 from utils import sha_256
 from address import Address
 from wallet import Wallet
+import sqlite3
 
 class Connection(object):
     """Wallet connection
@@ -12,43 +13,61 @@ class Connection(object):
 
     def allowConnection(self, id, password, newWallet=False):
         """Create or connecte to a wallet
-        
+
         id          : The identification of the user
         password    : The password of the user
         newWallet   : True to create a new wallet with these information
                       False to connecte to user to his Wallet
         """
         if newWallet:
-            self.createUser(id, sha_256(password)[:16] + sha_256(password[:48]))
-            return Wallet(AES_Key=sha_256(password)[16:48])
-        elif self.userExist(id, sha_256(password)[:16]+sha_256(password[:48])):
-            #check id and password (hash [:16]+[48:]) in the DB
-            addr = []   #Add the principal address on the first position
-            for ad in self.addrList(id): #All address in the DB
-                addr.append(ad)
-            return Wallet(addr=addr)
+            if self.newUser(id, sha_256(password)[:8] + sha_256(password)[24:]):
+                return Wallet(AES_Key=sha_256(password)[8:24])
         else:
-            return None
+            addr = self.userExist(id, sha_256(password)[:8] + sha_256(password)[24:])
+            if addr:
+                return Wallet(addr=addr)
+        return None
 
     def userExist(self, id, hashPassword):
         """Check in the DB if the user exist AND have enter the good password
+           Return the actualAddress of the user if id and hashPassword are correct
         """
-        # TODO: Check
-        return True
+        conn = sqlite3.connect('client.db')
+        cursor = conn.cursor()
+        cursor.execute("""SELECT actualAddress FROM users WHERE (ID=? AND hashPass=?)""", (id, hashPassword))
+        client = cursor.fetchone()
+        conn.close()
+        if client != None:
+             return client[0]
+        return False
+
+    def newUser(self, id, hashPassword):
+        """Create a new user in the DB
+           The new id cannot be already used in the DB
+           return True when the new user was create, False if the user id was already used
+        """
+        ret = True
+        conn = sqlite3.connect('client.db')
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""INSERT INTO users(ID, hashPass) VALUES(?, ?)""", (id, hashPassword))
+            cursor.execute("""SELECT * FROM users""")
+            conn.commit()
+        except sqlite3.IntegrityError:
+            ret = False
+        finally:
+            conn.close()
+            return ret
 
     def addrList(self, id):
         """Return a list of Address object with all address of the user in the DB
         """
         return []
 
-    def createUser(self, id, hashPassword):
-        """Create a new Wallet on the DB
-        """
-        #TODO: DB creation
-        pass
 
 
 if __name__ == '__main__':
-    conn = Connection()
-    w = conn.allowConnection("prout", "megaPassword")
-    print(w.count)
+    password = "veryGoodPassword"
+    print(sha_256(password).encode('utf-8'))
+    print(len(sha_256(password)))
+    print(sha_256(password)[:8] + sha_256(password)[24:])
