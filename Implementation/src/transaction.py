@@ -2,9 +2,11 @@ import json
 
 
 class Transaction(object):
-    def __init__(self, sender_public_key, receivers):
-        self.sender = sender
+    def __init__(self, sender_public_key, receivers, values):
+        self.sender_public_key= sender_public_key
         self.receivers = receivers
+        self.values = values
+        self.signature = None
 
     def toJson(self):
         return json.dumps({
@@ -14,10 +16,16 @@ class Transaction(object):
             })
 
     def sign(self, private_key):
-        pass
+        """Sign the transactions
+           To verify : sender_public_key.verify(m, sigature)
+        """
+        k = random.randint(2, self.publicKey.q - 1)
+        self.signature = private_key.sign(str(sum(self.values)),k)
 
     def is_signed():
-        pass
+        """Return True if the transaction is correctly sign
+        """
+        return self.sender_public_key.verify(str(sum(self.values)))
 
     @staticmethod
     def fromJson(data):

@@ -200,7 +200,6 @@ if __name__ == '__main__':
 	print("finished printing address list")
 
 
-
 	print("\n\n\n\n\n")
 	previousHash = blockchain.get_last_hash()
 	transaction_1 = Transaction(322, "A", "B")
