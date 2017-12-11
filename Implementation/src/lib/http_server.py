@@ -16,27 +16,27 @@ class EasyHandler(BaseHTTPRequestHandler):
     def no_response(self, code):
         self.send_response(code)
         self.end_headers()
-    
+
     def json_response(self, code, json=''):
         self.send_response(code)
         self.send_header('Content-type', 'application/json; charset=UTF-8')
         self.end_headers()
         self.wfile.write(bytes(json, 'UTF-8'))
-    
+
     def post_body(self):
         if 'Content-Length' in self.headers:
             l = self.headers['Content-Length']
             return self.rfile.read(int(l)).decode('UTF-8')
         else:
             return self.rfile.read().decode('UTF-8')
-    
+
     def get_block(self, previous_hash):
         block = self.server.blockchain.get_next_block(previous_hash)
         if block == None:
             self.no_response(204) # No Content
         else:
             self.json_response(200, block.toJson())
-    
+
     def post_block(self, json):
         b = Block.fromJson(json)
         if b == None:
@@ -64,7 +64,7 @@ class MasterHandler(EasyHandler):
         """
         ip = self.client_address[0]
         return ip in self.server.relays
-    
+
     def do_GET(self):
         if not self.allowed_client():
             self.no_response(401) # Unauthorized
@@ -89,7 +89,7 @@ class RelayServer(HTTPServer):
         self.blockchain = blockchain
         self.master = MasterClient()
         self.transactions = []
-        # HTTP client relays, used to broadcas transactions
+        # HTTP client relays, used to broadcast transactions
         self.relays = []
         for r in Network.get_relays():
             if r != server_address:
@@ -98,7 +98,7 @@ class RelayServer(HTTPServer):
 
 class RelayHandler(EasyHandler):
     error_message_format = ''
-    
+
     def post_block(self, json):
         # TODO submit to master before response
         b = EasyHandler.post_block(self, json)
@@ -109,7 +109,7 @@ class RelayHandler(EasyHandler):
     def get_transactions(self):
         json_ts = [t.toJson() for t in self.server.transactions]
         self.json_response(200, json.dumps(json_ts))
-    
+
     def post_transaction(self, json):
         t = Transaction.fromJson(json)
         if t == None:
@@ -120,7 +120,7 @@ class RelayHandler(EasyHandler):
             self.server.transactions.append(t)
             self.no_response(200) # OK
             self.broadcast_transaction(t)
-    
+
     def broadcast_transaction(t):
         for r in self.server.relays:
             r.post_transaction(t)

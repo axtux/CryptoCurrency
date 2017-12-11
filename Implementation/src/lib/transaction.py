@@ -22,7 +22,7 @@ class Transaction(object):
         self.sender_public_key = sender_public_key.public()
         self.receivers = receivers
         self.signature = None
-    
+
     def sign(self, private_key):
         """Sign the transactions
            private_key: Address object

@@ -14,7 +14,7 @@ class Updater(object):
         else:
             self.relay = relay
         self.log = logging.getLogger(__name__)
-    
+
     def update(self):
         """Update the blockchain from relay
            Stop when blockchain is updated (next block is None)

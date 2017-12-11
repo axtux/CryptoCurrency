@@ -207,7 +207,7 @@ def print_blocks(db):
             print(transaction[3])
             print(transaction[4])
             print("\n")
-    print("finished printingDB")
+    print("finished printing the DB")
 
 
 def print_addresses(db):
@@ -354,5 +354,4 @@ if __name__ == '__main__':
     print(blockchain.get_last_hash())
     print(sha_256(str(block2)))
 
-
-    # On detruit la base de donnee un fois qu'on detruit la blockchain
+    # we detroy the data base once we have destroyed the block chain

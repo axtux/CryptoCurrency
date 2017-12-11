@@ -23,6 +23,10 @@ The master node also handle GET and POST requests :
   - GET : get the last block of the blockchain.
   - POST : submit the new mined blocked to the relay nodes.
 
+# How to launch the program
+
+In a terminal, just type "python3 client.py"
+
 # How to use the wallet
 
 The user has to give a login and a password to use the wallet. If the user doesn't exist, a new wallet for this user is automatically created and the wallet download the blockchain. Otherwise, the user is connected to his wallet and the blockchain is updated.
