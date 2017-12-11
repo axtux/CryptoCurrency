@@ -72,6 +72,6 @@ if __name__ == '__main__':
         exit('usage: python3 '+sys.argv[0]+' YOUR_ADDRESS' )
 
     print('Starting miner with address '+str(sys.argv[1]))
-    b = Blockchain()
+    b = Blockchain('miner')
     miner=Miner(b,sys.argv[1],RelayClient())
     miner.run(randompow)

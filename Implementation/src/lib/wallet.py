@@ -21,7 +21,7 @@ class Wallet(object):
         password : The password is used to generate a AES_Key to ecrypt / decrypt the private key on DB
                    Here, we used it to load all the address or write the new address
         """
-        self.blockChain = Blockchain()
+        self.blockChain = Blockchain('client')
         self.relay = RelayClient()
         self.updater = Updater(self.blockChain, self.relay)
         self.updater.update()

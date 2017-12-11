@@ -26,8 +26,8 @@ class Blockchain(object):
     """
     FIRST_HASH = sha_256("42")
 
-    def __init__(self):
-        self.db = BlockchainDatabase("blockchain")
+    def __init__(self, name):
+        self.db = BlockchainDatabase(name)
         #print('initated BDD, last hash: '+self.get_last_hash())
 
     def __repr__(self):
@@ -243,14 +243,14 @@ if __name__ == '__main__':
     print("destroyed")
 
     print("NEW TEST:\n")
-    blockchain = Blockchain()
+    blockchain = Blockchain('test')
     db = blockchain.db
     previousHash = blockchain.get_last_hash()
 
 
     print("TESTING Blocks DB")
 
-    blockchain = Blockchain()
+    blockchain = Blockchain('test')
     db = blockchain.db
     previousHash = blockchain.get_last_hash()
 
@@ -327,7 +327,7 @@ if __name__ == '__main__':
     conn.commit()
     print("destroyed")
 
-    blockchain = Blockchain()
+    blockchain = Blockchain('test')
 
     print("passed2")
     blockchain.add_block(block)

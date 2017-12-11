@@ -13,7 +13,7 @@ if __name__ == '__main__':
     n = len(relays)
     i = int(sys.argv[1]) % n
     print('Starting relay '+str(i))
-    b = Blockchain()
+    b = Blockchain('relay'+str(i))
     master = Network.get_master()
     server = RelayServer(relays[i], b)
     server.serve_forever()
