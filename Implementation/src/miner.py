@@ -10,7 +10,7 @@ from lib.updater import Updater
 
 class Miner:
 
-    FLAG=5000000 #number of iteration of mining before check if the block has been found
+    FLAG=500000 #number of iteration of mining before check if the block has been found
 
 
     def __init__(self, blockchain, address, relay):

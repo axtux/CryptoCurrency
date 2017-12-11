@@ -1,4 +1,4 @@
-import sqlite3 
+import sqlite3
 
 # local imports
 from lib.utils import sha_256
@@ -44,6 +44,7 @@ class Blockchain(object):
         h = self.db.get_last_hash()
         if h == None:
             return self.FIRST_HASH
+        return h
 
     def get_next_block(self, previous_hash):
         json = self.db.get_json_block(previous_hash)
@@ -89,26 +90,26 @@ class Blockchain(object):
                 # Si oui on update son argent
                     temp_amount = int(temp[1]) + block.transactions[i].amount
                     self.db.set_address_amount(block.transactions[i].receiver, temp_amount)
-                
+
             self.db.set_last_hash(block.hash())
 
 
 class BlockchainDatabase(object):
     def __init__(self, name):
         self.conn = sqlite3.connect("databases/"+name+".db")
-        
+
         # blocks
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS blocks (
             previous_hash TEXT PRIMARY KEY NOT NULL,
             json_block TEXT NOT NULL
         );""")
-        
+
         # last_hash
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS last_hash (
             void INTEGER PRIMARY KEY NOT NULL,
-            hash TEXT 
+            hash TEXT
         );""")
 
         # addresses with amount and spent flag
@@ -118,13 +119,13 @@ class BlockchainDatabase(object):
             amount INTEGER DEFAULT NULL,
             spent BOOLEAN DEFAULT NULL
         );""")
-    
+
     """
     def fetch_one(self, sql, params=None):
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
         return cursor.fetchone()
-    
+
     def fetch_all(self, sql, params=None):
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
@@ -149,7 +150,7 @@ class BlockchainDatabase(object):
         sql = "INSERT INTO blocks (previous_hash, json_block) VALUES (?, ?) ;"
         cursor.execute(sql, (previous_hash, json_block))
         self.conn.commit()
-    
+
     def add_address(self, address, amount=0, spent=0):
         cursor = self.conn.cursor()
         sql = "INSERT INTO addresses (address, amount, spent) VALUES (?, ?, ?) ;"
@@ -227,7 +228,7 @@ def print_addresses(db):
 
 if __name__ == '__main__':
 
-    
+
     conn = sqlite3.connect("databases.blockchain.db")
     cursor = conn.cursor()
     print("deleting DB")
@@ -337,7 +338,7 @@ if __name__ == '__main__':
     print("printing address list")
     print_addresses(db)
     print("finished printing address list")
-    
+
 
 
 
@@ -357,6 +358,5 @@ if __name__ == '__main__':
     print(blockchain.get_last_hash())
     print(sha_256(str(block2)))
 
-    
+
     # On detruit la base de donnee un fois qu'on detruit la blockchain
-    
