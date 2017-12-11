@@ -1,19 +1,19 @@
-import math
-import random
-from hashlib import sha256
-from Crypto import Random
-import sqlite3
+import json
+from Crypto.PublicKey import DSA
 
 # local imports
-from lib.utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, ripemd_160
-from lib.walletDB import loadKey, recordAddress
+from lib.utils import ripemd_160
 
 class Address(object):
-    """The private and public key for the Wallet
-    The public key is also the adresse to make transaction with the Wallet
+    """manage DSA asymetric keys and adds some methods
+    used as private and public key for the Wallet
     """
-
-    def __init__(self, AES_Key=None, addr=None):
+    def __init__(self, dsa=None):
+        if dsa is None:
+            self.dsa = DSA.generate(1024)
+        else:
+            self.dsa = dsa
+        """TODO move to BDD
         if addr == None:    #Generate  a new address
             self.iv = iv()
             self.privateKey = generateDSAKey()
@@ -25,36 +25,42 @@ class Address(object):
             self.address = addr
             self.privateKey, self.iv = loadKey(self.address)
             self.publicKey = self.privateKey.publickey()
-
-    def generateAddress(self):
-        """Create a hash with the Public Key to make an adress
         """
-        return ripemd_160([str(self.publicKey.y), str(self.publicKey.g), str(self.publicKey.p), str(self.publicKey.q)])
 
-
-if __name__ == '__main__':
-    password = "veryGoodPassword"
-    key = sha_256(password)[:32].encode('utf-8')
-    mess = "bonjour"
-    #iv = iv()
-
-    a = Address(AES_Key=key)
-    addr = a.address
-    print(a.privateKey.y)
-    print(a.privateKey.g)
-    print(a.privateKey.p)
-    print(a.privateKey.q)
-    print(a.privateKey.x)
-    b = Address(addr=addr)
-    print("------")
-    print(a.privateKey.y == b.privateKey.y)
-    print(a.privateKey.g == b.privateKey.g)
-    print(a.privateKey.p == b.privateKey.p)
-    print(a.privateKey.q == b.privateKey.q)
-    print(a.privateKey.x == b.privateKey.x)
-
-"""
-    c = encrypt_AES(key,mess,iv)
-    e = decrypt_AES(key,c,iv)
-    print(e.decode('utf-8'))
-"""
+    def __str__(self):
+        """Create hash from public key to make an address
+        """
+        k = self.dsa
+        return ripemd_160([str(k.y), str(k.g), str(k.p), str(k.q)])
+    
+    def public(self):
+        return Address(self.dsa.publickey())
+    
+    def toJson(self):
+        data = {}
+        # public key fields
+        data['y'] = self.dsa.y
+        data['g'] = self.dsa.g
+        data['p'] = self.dsa.p
+        data['q'] = self.dsa.q
+        # private key (optionnal)
+        try:
+            data['x'] = self.dsa.x
+        except AttributeError:
+            pass
+        return json.dumps(data)
+    
+    @staticmethod
+    def fromJson(json_dsa):
+        try:
+            data = json.loads(json_dsa)
+            if ('x' in data): # private key
+                t = (data['y'], data['g'], data['p'], data['q'], data['x'])
+            else: # only public key
+                t = (data['y'], data['g'], data['p'], data['q'])
+            return Address(DSA.construct(t))
+        # JSON ValueError for decode
+        # KeyError if no accessed key
+        # DSA TypeError if not int
+        except (ValueError, KeyError, TypeError):
+            return None
