@@ -14,17 +14,8 @@ class Block:
         self.set_transactions(transactions)
 
     def set_transactions(self, transactions):
-        # add valid transactions
-        self.transactions = []
-        for t in transactions:
-            # TODO: is_valid needs a bloc but none is given
-            """
-            if not t.is_valid():
-                continue
-            if len(self.transactions) >= self.MAX_TRANSACTIONS:
-                break
-            """
-            self.transactions.append(t)
+        # add a maximum of transactions
+        self.transactions = transactions[:MAX_TRANSACTIONS]
         # update transactions hash
         h = hashlib.sha256()
         for i in self.transactions:
@@ -44,9 +35,13 @@ class Block:
     def get_hash(self):
         return self.hash
 
-    def is_valid(self):
+    def is_valid(self, blockchain):
         """Check that hash starts with some zeroes
+        and that addresses are valid
         """
+        for t in transacitons:
+            if not t.is_valid(blockchain):
+                return False
         return self.hash[:Block.DIFFICULTY] == '0'* Block.DIFFICULTY
 
     def toJson(self):
