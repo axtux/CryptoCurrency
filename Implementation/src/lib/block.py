@@ -17,10 +17,13 @@ class Block:
         # add valid transactions
         self.transactions = []
         for t in transactions:
+            # TODO: is_valid needs a bloc but none is given
+            """
             if not t.is_valid():
                 continue
             if len(self.transactions) >= self.MAX_TRANSACTIONS:
                 break
+            """
             self.transactions.append(t)
         # update transactions hash
         h = hashlib.sha256()
