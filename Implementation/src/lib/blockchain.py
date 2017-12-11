@@ -342,9 +342,10 @@ if __name__ == '__main__':
 
     print("\n\n\n\n\n")
     previousHash = blockchain.get_last_hash()
-    transaction_1 = Transaction(322, "A", "B")
-    transaction_2 = Transaction(234324, "Z", "T")
-    transactions = [transaction_1, transaction_2]
+    sender2 = Address()
+    receiver21 = Address()
+    receiver22 = Address()
+    transactions = [Transaction(sender.public(), ([str(receiver1), str(receiver2)], [10, 300]))]
     block2 = Block(previousHash, transactions)
 
     blockchain.add_block(block2)
