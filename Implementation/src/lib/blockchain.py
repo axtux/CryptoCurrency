@@ -95,7 +95,7 @@ class Blockchain(object):
 
 class BlockchainDatabase(object):
     def __init__(self, name):
-        self.conn = sqlite3.connect("databases."+name+".db")
+        self.conn = sqlite3.connect("databases/"+name+".db")
         
         # blocks
         self.conn.execute("""
