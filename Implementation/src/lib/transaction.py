@@ -2,6 +2,17 @@ import json
 import random
 from lib.utils import sha_256_bytes, ripemd_160
 
+"""API
+
+sign(Address)
+is_signed()
+get_total_amount(): get amount of sent money (can be < available if fee > 0)
+is_valid(blockchain): signed and amount <= available amount on sender address
+senderAddress(): string
+toJson(): serialize
+fromJson(): serialize
+"""
+
 class Transaction(object):
     def __init__(self, sender_public_key, receivers):
         """sender_public_key: Address object
