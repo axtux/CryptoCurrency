@@ -5,6 +5,7 @@ import sys
 from lib.blockchain import Blockchain
 import lib.updater
 from lib.network import Network
+from lib.http_client import RelayClient
 class Miner:
 
     FLAG=10 #number of iteration of mining before check if the block has been found
@@ -66,10 +67,8 @@ if __name__ == '__main__':
     argc = len(sys.argv)
     if not argc == 2:
         exit('usage: python3 '+sys.argv[0]+' YOUR_ADDRESS' )
-    relays = Network.get_relays()
-    n = len(relays)
-    i=random.randint(0,n)
+
     print('Starting miner with address '+str(sys.argv[1]))
     b = Blockchain()
-    miner=Miner(b,sys.argv[1],relays[i])
+    miner=Miner(b,sys.argv[1],RelayClient())
     miner.run(randompow)
