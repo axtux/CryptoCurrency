@@ -6,7 +6,7 @@ import os
 def showDetails(wallet):
     print(wallet.user_ID)
     #wallet.checkUpdate()
-    print(wallet.addr.address + " => " + str(wallet.count))
+    print(str(wallet.addr) + " => " + str(wallet.count))
     print("\n\n\nIt's possible that this value was not up-to-date. Please, want some minutes to validate the last transaction")
 
 def makeTransaction(wallet):

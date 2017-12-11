@@ -13,19 +13,6 @@ class Address(object):
             self.dsa = DSA.generate(1024)
         else:
             self.dsa = dsa
-        """TODO move to BDD
-        if addr == None:    #Generate  a new address
-            self.iv = iv()
-            self.privateKey = generateDSAKey()
-            self.privateKey.x = encrypt_AES(AES_Key, intToBytes(self.privateKey.x), self.iv)
-            self.publicKey = self.privateKey.publickey()
-            self.address = self.generateAddress()
-            recordAddress(self.address, self.publicKey.y, self.publicKey.g, self.publicKey.p, self.publicKey.q, self.privateKey.x, self.iv)
-        else:   #Load an existing address
-            self.address = addr
-            self.privateKey, self.iv = loadKey(self.address)
-            self.publicKey = self.privateKey.publickey()
-        """
 
     def __str__(self):
         """Create hash from public key to make an address
