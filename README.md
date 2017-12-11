@@ -25,7 +25,7 @@ The master node also handle GET and POST requests :
 
 # How to launch the program
 
-In a terminal, just type "python 3 client.py"
+In a terminal, just type "python3 client.py"
 
 # How to use the wallet
 

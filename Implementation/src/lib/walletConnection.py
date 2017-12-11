@@ -12,10 +12,9 @@ class Connection(object):
 
     def __init__(self):
         createDB()
-        pass
 
     def allowConnection(self, user_ID, password, newWallet=False):
-        """Create or connecte to a wallet
+        """Create or connect to a wallet
 
         user_ID     : The identification of the user
         password    : The password of the user

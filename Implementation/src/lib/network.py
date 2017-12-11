@@ -1,10 +1,10 @@
 
 
 class Network(object):
-    
+
     def get_master():
         return ('127.42.42.1', 8080)
-    
+
     def get_relays():
         return [
             ('127.0.0.1', 8080),
