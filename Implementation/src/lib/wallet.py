@@ -7,7 +7,7 @@ from lib.utils import sha_256
 from lib.address import Address
 from lib.updater import Updater
 from lib.walletDB import loadAddressList
-from lib.http_client import RelayNode
+from lib.http_client import RelayClient
 
 class Wallet(object):
     """Wallet is the principal user
@@ -22,7 +22,7 @@ class Wallet(object):
         addr    : The current adress of the user
         """
         self.blockChain = Blockchain()
-        self.relay = RelayNode()
+        self.relay = RelayClient()
         self.updater = Updater(self.blockChain, self.relay)
         self.updater.update()
         self.user_ID = user_ID

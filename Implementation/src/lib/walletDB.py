@@ -2,7 +2,7 @@ import sqlite3
 from lib.utils import buildDSAKey
 
 
-DB_PATH = '../databases/client.db'
+DB_PATH = 'databases/client.db'
 
 def createDB():
     """Create all using data base
@@ -17,7 +17,7 @@ def createDB():
     );""")
 
     cursor.execute("""
-        CREATE TABLE addresses (
+        CREATE TABLE IF NOT EXISTS addresses (
     	address	TEXT PRIMARY KEY NOT NULL,
     	pkey_y	TEXT NOT NULL,
     	pkey_g	TEXT NOT NULL,
@@ -28,7 +28,7 @@ def createDB():
     );""")
 
     cursor.execute("""
-        CREATE TABLE users (
+        CREATE TABLE IF NOT EXISTS users (
     	ID	TEXT PRIMARY KEY NOT NULL UNIQUE,
     	hashPass	TEXT NOT NULL
     );""")
