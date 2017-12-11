@@ -19,9 +19,9 @@ class Block:
         for t in transactions:
             if not t.is_valid():
                 continue
-            if len(self.transactions) >= MAX_TRANSACTIONS:
+            if len(self.transactions) >= self.MAX_TRANSACTIONS:
                 break
-            self.transactions.append(i)
+            self.transactions.append(t)
         # update transactions hash
         h = hashlib.sha256()
         for i in self.transactions:
