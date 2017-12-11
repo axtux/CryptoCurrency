@@ -28,7 +28,7 @@ class Blockchain(object):
 
     def __init__(self):
         self.db = BlockchainDatabase("blockchain")
-        print('initated BDD, last hash: '+self.get_last_hash())
+        #print('initated BDD, last hash: '+self.get_last_hash())
 
     def __repr__(self):
         temp = "\n"
