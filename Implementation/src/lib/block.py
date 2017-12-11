@@ -26,7 +26,7 @@ class Block:
         h = hashlib.sha256()
         for i in self.transactions:
             h.update(i.toJson().encode('utf-8'))
-        self.transactions_hash = h.hexDigest()
+        self.transactions_hash = h.hexdigest()
 
     def set_proof(self, proof):
         # hash previous_hash, miner_address, transactions_hash and proof
@@ -36,7 +36,7 @@ class Block:
         h.update(self.miner_address.encode('utf-8'))
         h.update(self.transactions_hash.encode('utf-8'))
         h.update(str(proof).encode('utf-8'))
-        self.hash = h.hexDigest()
+        self.hash = h.hexdigest()
     
     def get_hash(self):
         return self.hash
