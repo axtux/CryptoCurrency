@@ -5,7 +5,6 @@ from lib.utils import sha_256
 from lib.block import Block
 from lib.transaction import Transaction
 from lib.address import Address
-from lib.miner import Miner
 
 """API
 get_last_hash(): string
@@ -153,9 +152,9 @@ class BlockchainDatabase(object):
         cursor.execute(sql, (address, amount, spent))
         self.conn.commit()
 
-    def get_last_hash(self, last_hash):
+    def get_last_hash(self):
         cursor = self.conn.cursor()
-        cursor.execute("SELECT hash FROM last_hash", (last_hash,))
+        cursor.execute("SELECT hash FROM last_hash")
         return cursor.fetchone()
 
     def get_address(self, address):
@@ -190,7 +189,6 @@ def print_blocks(db):
         print("block:")
         print(row[0])
         print(row[1])
-        print(row[2])
         # with a block, call block.transactions
         transactions = []
         for transaction in transactions:
@@ -214,13 +212,30 @@ def print_addresses(db):
     blockchain.conn.commit()
 
 if __name__ == '__main__':
-    db = BlockchainDatabase("blocks")
-    print_blocks(db)
     print("NEW TEST:\n")
     blockchain = Blockchain()
+    print("destroying de DB")
+    cursor = blockchain.db.conn.cursor()
+    cursor.execute("""
+        DROP TABLE blocks
+    """)
+    cursor.execute("""
+        DROP TABLE addresses
+    """)
+    cursor.execute("""
+        DROP TABLE last_hash
+    """)
+    blockchain.db.conn.commit()
+    print("destroyed")
+
+
+
+    blockchain = Blockchain() 
+    print(" blockchain is indeed empty: " + str(blockchain))
     print("passed1")
     previousHash = blockchain.get_last_hash()
-    print(previousHash)
+    print("previousHash: " + str(previousHash))
+    print("passed2")
     password = "veryGoodPassword"
     key = sha_256(password)[:32].encode('utf-8')
     mess = "bonjour"
@@ -242,8 +257,13 @@ if __name__ == '__main__':
     mess_miner = "bonjour"
     #iv = iv()
     miner_address = Address(AES_Key=key_miner)
-    miner = Miner(blockchain, miner_address, relay)
     block = Block(previousHash, miner_address.address, transactions)
+    block.set_proof("43334")
+    db = BlockchainDatabase("blocks")
+    print("DB blocks without block")
+    print_blocks(db)
+
+
     print("passed2")
     blockchain.add_block(block)
     print("passed3")
@@ -251,6 +271,21 @@ if __name__ == '__main__':
     print("printing address list")
     print_addresses(db)
     print("finished printing address list")
+
+    print("destroying de DB")
+    cursor = blockchain.db.conn.cursor()
+    cursor.execute("""
+        DROP TABLE blocks
+    """)
+    cursor.execute("""
+        DROP TABLE addresses
+    """)
+    cursor.execute("""
+        DROP TABLE last_hash
+    """)
+    blockchain.db.conn.commit()
+    print("destroyed")
+    
 
 
 
@@ -272,15 +307,4 @@ if __name__ == '__main__':
 
     
     # On detruit la base de donnee un fois qu'on detruit la blockchain
-    print("destroying de DB")
-    self.cursor.execute("""
-        DROP TABLE Blockchain_blocks
-    """)
-    self.cursor.execute("""
-        DROP TABLE Blockchain_address
-    """)
-    self.conn.execute("""
-        DROP TABLE Blockchain_transactions
-    """)
-    self.conn.commit()
-    print("destroyed")
+    
