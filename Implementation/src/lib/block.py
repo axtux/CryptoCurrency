@@ -15,7 +15,7 @@ class Block:
 
     def set_transactions(self, transactions):
         # add a maximum of transactions
-        self.transactions = transactions[:MAX_TRANSACTIONS]
+        self.transactions = transactions[:Block.MAX_TRANSACTIONS]
         # update transactions hash
         h = hashlib.sha256()
         for i in self.transactions:
@@ -39,7 +39,7 @@ class Block:
         """Check that hash starts with some zeros
         and that addresses are valid
         """
-        for t in transacitons:
+        for t in self.transactions:
             if not t.is_valid(blockchain):
                 return False
         return self.hash[:Block.DIFFICULTY] == '0'* Block.DIFFICULTY

@@ -10,7 +10,7 @@ from lib.updater import Updater
 
 class Miner:
 
-    FLAG=5000000 #number of iteration of mining before check if the block has been found
+    FLAG=500000 #number of iteration of mining before check if the block has been found
 
 
     def __init__(self, blockchain, address, relay):
@@ -27,7 +27,10 @@ class Miner:
     def get_ordered_transactions(self):
         """Allow to choose wich transactions will be placed in the block
         For now, it just take them in the chronological order"""
-        return self.relay.get_transactions()
+        ts = self.relay.get_transactions()
+        if ts == None:
+            return []
+        return ts
 
     def run(self,strategy):
         """Strategy is the function called to find the next PoW"""
@@ -40,7 +43,7 @@ class Miner:
             else:
                 self.flag = self.flag - 1
                 self.mine(strategy)
-                if(self.block.is_valid()):
+                if(self.block.is_valid(self.blockchain)):
                     self.relay.submit_block(self.block)
                     self.flag = 0 #Need to take new transactions
 

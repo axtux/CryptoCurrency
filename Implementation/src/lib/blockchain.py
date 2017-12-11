@@ -44,6 +44,7 @@ class Blockchain(object):
         h = self.db.get_last_hash()
         if h == None:
             return self.FIRST_HASH
+        return h
 
     def get_next_block(self, previous_hash):
         json = self.db.get_json_block(previous_hash)
@@ -163,8 +164,9 @@ class BlockchainDatabase(object):
     def get_address(self, address):
         cursor = self.conn.cursor()
         sql = "SELECT address, amount, spent FROM addresses WHERE address=? ;"
-        cursor.execute(sql, (address))
-        return self.cursor.fetchone()
+        cursor.execute(sql, (address, ))
+        res = cursor.fetchone()
+        return res
 
     def set_last_hash(self, last_hash):
         cursor = self.conn.cursor()
