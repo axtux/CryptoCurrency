@@ -49,7 +49,6 @@ class Wallet(object):
            Each tuples is like : (str_address, value)
            The last transaction is the rest of the wallet send to the new user address
         """
-        # TODO
         self.checkUpdate()
         newAddr = Address()
         newAddr.encryptPrivateKey(password)
@@ -60,11 +59,12 @@ class Wallet(object):
             self.addr.decryptPrivateKey(password)
             transac.sign(self.addr)
             self.addr.encryptPrivateKey(password)
-            self.relay.submit_transaction(transac)
+            if not self.relay.submit_transaction(transac):
+                return False
             self.addrList.append(newAddr)
             self.addr = newAddr
             add_address(self.user_ID, self.addr, len(self.addrList)-1)
-            return transac
+            return True
         else:
             return False
 
