@@ -21,10 +21,10 @@ class Wallet(object):
         password : The password is used to generate a AES_Key to ecrypt / decrypt the private key on DB
                    Here, we used it to load all the address or write the new address
         """
-        #self.blockChain = Blockchain()
-        #self.relay = RelayClient()
-        #self.updater = Updater(self.blockChain, self.relay)
-        #self.updater.update()
+        self.blockChain = Blockchain()
+        self.relay = RelayClient()
+        self.updater = Updater(self.blockChain, self.relay)
+        self.updater.update()
         self.user_ID = user_ID
         self.addrList = loadAddressList(self.user_ID)   # list of address
         self.last = len(self.addrList)-1    #index of the actual address
@@ -35,8 +35,7 @@ class Wallet(object):
             self.addrList.append(self.addr)
         else:
             self.addr = self.addrList[len(self.addrList)-1]
-        #self.count = self.blockChain.get_amount_of_address(self.addr)
-        self.count = 80
+        self.count = self.blockChain.get_amount_of_address(self.addr)
 
     def checkUpdate(self):
         """Update the amount and the blockChain
@@ -51,7 +50,7 @@ class Wallet(object):
            The last transaction is the rest of the wallet send to the new user address
         """
         # TODO
-        #self.checkUpdate()
+        self.checkUpdate()
         newAddr = Address()
         newAddr.encryptPrivateKey(password)
         total = sum([ i[1] for i in destList ])
@@ -61,7 +60,7 @@ class Wallet(object):
             self.addr.decryptPrivateKey(password)
             transac.sign(self.addr)
             self.addr.encryptPrivateKey(password)
-            #self.relay.submit_transaction(transac)
+            self.relay.submit_transaction(transac)
             self.addrList.append(newAddr)
             self.addr = newAddr
             add_address(self.user_ID, self.addr, len(self.addrList)-1)
