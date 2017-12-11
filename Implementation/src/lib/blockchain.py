@@ -118,6 +118,23 @@ class BlockchainDatabase(object):
             spent BOOLEAN DEFAULT NULL
         );""")
     
+    def fetch_one(sql, params=None)
+        cursor = self.conn.cursor()
+        cursor.execute(sql, params)
+        return cursor.fetchone()
+    
+    def fetch_all(sql, params=None)
+        cursor = self.conn.cursor()
+        cursor.execute(sql, params)
+        return cursor.fetchall()
+    
+    def commit(sql, params=None)
+        cursor = self.conn.cursor()
+        cursor.execute(sql, params)
+        elf.conn.commit()
+        # TODO check cursor.rowcount
+        return cursor.rowcount
+    
     def get_json_block(self, previous_hash):
         cursor = self.conn.cursor()
         sql = "SELECT previous_hash, json_block FROM blocks WHERE previous_hash=?"
