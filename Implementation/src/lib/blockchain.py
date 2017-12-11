@@ -1,6 +1,6 @@
 from utils import sha_256
 from block import Block
-from transactions import Transaction
+from transaction import Transaction
 import sqlite3 
 
 
