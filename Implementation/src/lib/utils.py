@@ -48,6 +48,18 @@ def sha_256(text):
             h.update(i.encode('utf-8'))
     return h.hexdigest()
 
+def sha_256_bytes(text):
+    """hash the content of text
+       text : String or list of String
+    """
+    h = sha256()
+    if type(text) == str:
+        h.update(text.encode('utf-8'))
+    else: #type(text) == list
+        for i in text:
+            h.update(i.encode('utf-8'))
+    return h.digest()
+
 def ripemd_160(text):
     """hash the content of text
        text : String or list of String
