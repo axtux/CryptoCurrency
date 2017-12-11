@@ -1,8 +1,8 @@
 import lib.utils
-import lib.block
+from lib.block import Block
 import random
 import sys
-import lib.blockchain
+from lib.blockchain import Blockchain
 import lib.updater
 from lib.network import Network
 class Miner:
@@ -16,7 +16,7 @@ class Miner:
         self.flag=0
 
     def create_block(self):
-        self.block= Block(self.blockchain.get_last_block().hash(),self.address,self.get_ordered_transactions())
+        self.block= Block(self.blockchain.get_last_hash(),self.address,self.get_ordered_transactions())
 
 
     def get_ordered_transactions(self):
@@ -59,6 +59,9 @@ class Miner:
     def randompow(self,previousPow=0):
         return random.randint(0,2**256)
 
+
+def randompow(previousPow=0):
+    return random.randint(0,2**256)
 if __name__ == '__main__':
     argc = len(sys.argv)
     if not argc == 2:
@@ -69,4 +72,4 @@ if __name__ == '__main__':
     print('Starting miner with address '+str(sys.argv[1]))
     b = Blockchain()
     miner=Miner(b,sys.argv[1],relays[i])
-    miner.run()
+    miner.run(randompow)
