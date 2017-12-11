@@ -1,39 +1,10 @@
 from Crypto.Util import number
-from Crypto.PublicKey import DSA
 from Crypto.Cipher import AES
 from Crypto import Random
 from hashlib import sha256
 from hashlib import new as ripemd160
 import random
 import json
-
-def DSAtoJSON(dsa):
-    data = {}
-    # public key fields
-    data['y'] = dsa.y
-    data['g'] = dsa.g
-    data['p'] = dsa.p
-    data['q'] = dsa.q
-    # private key (optionnal)
-    try:
-        data['x'] = dsa.x
-    except AttributeError:
-        pass
-    return json.dumps(data)
-
-def JSONtoDSA(json_dsa):
-    try:
-        data = json.loads(json_dsa)
-        if ('x' in data): # private key
-            t = (data['y'], data['g'], data['p'], data['q'], data['x'])
-        else: # only public key
-            t = (data['y'], data['g'], data['p'], data['q'])
-        return DSA.construct(t)
-    # JSON ValueError for decode
-    # KeyError if no accessed key
-    # DSA TypeError if not int
-    except (ValueError, KeyError, TypeError):
-        return None
 
 def generatePrime(n):
      """Generate a N-bit Prime Number
@@ -45,13 +16,6 @@ def intToBytes(n):
 
 def bytesToInt(b):
     return int.from_bytes(b, 'big')
-
-def generateDSAKey():
-    return DSA.generate(1024)      #3072 is recomend by the NIST 800-57
-
-def buildDSAKey(y, g, p, q, x):
-    key = DSA.construct((x, g, p, q, x))
-    return key
 
 def encrypt_AES(key, m, iv):
     """Encrypt a byte string plainText with a key and a random iv
