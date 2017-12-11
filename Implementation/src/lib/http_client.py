@@ -33,10 +33,14 @@ class MasterClient(object):
 
 class RelayClient(MasterClient):
     
-    def __init__(self):
+    def __init__(self, relay=None):
+        """initialite an http client to request the relay server
+        if relay is None, random relay is chosen from Network
+        """
         servers = Network.get_relays()
-        s = servers[randint(0, len(servers)-1)]
-        self.url = 'http://'+s[0]+':'+s[1]+'/'
+        if relay == None
+            relay = servers[randint(0, len(servers)-1)]
+        self.url = 'http://'+relay[0]+':'+relay[1]+'/'
 
     def get_transactions(self):
         """send GET request to relay/transactions/ and parse it
