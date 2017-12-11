@@ -7,7 +7,7 @@ from lib.wallet import Wallet
 
 class Connection(object):
     """Wallet connection
-    The user uses it to connect him to his wallet
+       The user uses it to connect him to his wallet
     """
 
     def __init__(self):
@@ -61,6 +61,36 @@ class Connection(object):
             conn.close()
             return ret
 
+    def createDB(self):
+        """Create all using data base
+        """
+        conn = sqlite3.connect('../databases/client.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS addrList (
+        	user_ID	TEXT NOT NULL,
+        	addr	TEXT NOT NULL,
+        	num	INTEGER NOT NULL
+        );""")
+
+        cursor.execute("""
+            CREATE TABLE addresses (
+        	address	TEXT PRIMARY KEY NOT NULL,
+        	pkey_y	TEXT NOT NULL,
+        	pkey_g	TEXT NOT NULL,
+        	pkey_p	TEXT NOT NULL,
+        	pkey_q	TEXT NOT NULL,
+        	prkey_x	BLOB NOT NULL
+        );""")
+
+        cursor.execute("""
+            CREATE TABLE users (
+        	ID	TEXT PRIMARY KEY NOT NULL UNIQUE,
+        	hashPass	TEXT NOT NULL,
+        	actualAddress	TEXT NOT NULL UNIQUE
+        );""")
+        conn.commit()
+        conn.close()
 
 
 if __name__ == '__main__':
