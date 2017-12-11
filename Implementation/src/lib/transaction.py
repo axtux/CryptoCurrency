@@ -56,7 +56,7 @@ class Transaction(object):
     def senderAddress(self):
         """Return the sender address from the public key
         """
-        return ripemd_160([str(self.sender_public_key.y), str(self.sender_public_key.g), str(self.sender_public_key.p), str(self.sender_public_key.q)])
+        return str(self.sender_public_key)
 
     def toJson(self, signature=True):
         return json.dumps({
