@@ -4,7 +4,7 @@ import sqlite3
 from lib.utils import sha_256
 from lib.address import Address
 from lib.wallet import Wallet
-from lib.walletDB import createDB
+from lib.walletDB import createDB, userExist, newUser
 
 class Connection(object):
     """Wallet connection
@@ -15,7 +15,7 @@ class Connection(object):
         createDB()
         pass
 
-    def allowConnection(self, id, password, newWallet=False):
+    def allowConnection(self, user_ID, password, newWallet=False):
         """Create or connecte to a wallet
 
         id          : The identification of the user
@@ -25,43 +25,14 @@ class Connection(object):
         """
         hashPass = sha_256(password)
         if newWallet:
-            if self.newUser(id, hashPass[:16] + hashPass[48:]):
-                return Wallet(id, AES_Key=hashPass[16:48])
+            if newUser(user_ID, hashPass[:16] + hashPass[48:]):
+                return Wallet(user_ID, AES_Key=hashPass[16:48])
         else:
-            addr = self.userExist(id, hashPass[:16] + hashPass[48:])
-            if addr:
-                return Wallet(id, addr=addr)
+            if userExist(user_ID, hashPass[:16] + hashPass[48:])
+                return Wallet(user_ID)
         return None
 
-    def userExist(self, id, hashPassword):
-        """Check in the DB if the user exist AND have enter the good password
-           Return the actualAddress of the user if id and hashPassword are correct
-        """
-        conn = sqlite3.connect('client.db')
-        cursor = conn.cursor()
-        cursor.execute("""SELECT actualAddress FROM users WHERE (ID=? AND hashPass=?)""", (id, hashPassword))
-        client = cursor.fetchone()
-        conn.close()
-        if client != None:
-             return client[0]
-        return False
 
-    def newUser(self, id, hashPassword):
-        """Create a new user in the DB
-           The new id cannot be already used in the DB
-           return True when the new user was create, False if the user id was already used
-        """
-        ret = True
-        conn = sqlite3.connect('../databases/client.db')
-        cursor = conn.cursor()
-        try:
-            cursor.execute("""INSERT INTO users(ID, hashPass, actualAddress) VALUES(?, ?, ?)""", (id, hashPassword, ""))
-            conn.commit()
-        except sqlite3.IntegrityError:
-            ret = False
-        finally:
-            conn.close()
-            return ret
 
 
 
