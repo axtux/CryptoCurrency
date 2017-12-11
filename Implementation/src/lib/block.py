@@ -30,7 +30,7 @@ class Block:
 
     def set_proof(self, proof):
         # hash previous_hash, miner_address, transactions_hash and proof
-        self.pow = proof
+        self.proof = proof
         h = hashlib.sha256()
         h.update(self.previous_hash.encode('utf-8'))
         h.update(self.miner_address.encode('utf-8'))
