@@ -32,7 +32,7 @@ class Blockchain(object):
         return self._last_block
 
     def get_last_hash(self):
-        return self._last_hash
+        return self.last_hash
 
     def get_amount_of_address(self, address):
         r = self.db.get_address(address)
@@ -43,13 +43,13 @@ class Blockchain(object):
         Blockchain.count += 1
         # On update le dernier block et le hash du dernier bloc
         self._last_block = block
-        self._last_hash = sha_256(str(self._last_block))
+        self.last_hash = sha_256(str(self._last_block))
         # on rajoute le bloc dans la DB contenant tout les blocs
-        self.write_in_blocks_DB(block.previousHash, block.pow, block.difficulty)
+        self.db.add_block(block.previousHash, block)
         for i in range(len(block.transactions)):
             # Pour chaque transaction, on la rajoute dans la DB des transactions
             self.write_in_transactions_DB(block.previousHash, i, block.transactions[i].amount, block.transactions[i].sender, block.transactions[i].receiver);
-            temp = self.select_address(block.transactions[i].receiver)
+            temp = self.get_address(block.transactions[i].receiver)
             if temp == None:
                 # On cherche si l'addresse a deja ete utilise pour recevoir. Si non on la rajoute
                 self.write_in_address_DB(block.transactions[i].receiver, block.transactions[i].amount, False);
@@ -129,7 +129,7 @@ class BlockchainDatabase(object):
         self.cursor.execute(sql, (spent, address))
         self.conn.commit()
 
-def print_Blockchain_blocks():
+def print_blocks(db):
     self.cursor.execute("SELECT hash_of_previous_block, proof_of_work , difficulty FROM Blockchain_blocks")
     rows = self.cursor.fetchall()
     for row in rows:
@@ -160,7 +160,7 @@ def print_Blockchain_address(blockchain):
     blockchain.conn.commit()
 
 if __name__ == '__main__':
-    
+    db = BlockchainDatabase('blockchain')
     print("NEW TEST:\n")
     blockchain = Blockchain()
     previousHash = blockchain.get_last_hash()
