@@ -54,7 +54,7 @@ class Miner:
 
     def mine(self,strategy):
         digest = self.block.set_proof(strategy(self.index))
-        self.index = self.index +1 
+        self.index = self.index +1
 
 """
     def randompow(self,previousPow=0):
