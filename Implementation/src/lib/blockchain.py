@@ -67,11 +67,9 @@ class Blockchain(object):
         # TODO: english comments
         # On update le dernier block et le hash du dernier bloc
         # on rajoute le bloc dans la DB contenant tout les blocs
-        self.db.set_last_hash(sha_256(block))
+        self.db.set_last_hash(sha_256(str(block)))
         self.db.add_json_block(blockchain.db.get_last_hash(), block.toJson())
         for i in range(len(block.transactions)):
-            # Pour chaque transaction, on la rajoute dans la DB des transactions
-            self.write_in_transactions_DB(block.previousHash, i, block.transactions[i].amount, block.transactions[i].sender, block.transactions[i].receiver);
             temp = self.get_address(block.transactions[i].receiver)
             if temp == None:
                 # On cherche si l'addresse a deja ete utilise pour recevoir. Si non on la rajoute
@@ -167,7 +165,7 @@ class BlockchainDatabase(object):
     def get_address(self, address):
         cursor = self.conn.cursor()
         sql = "SELECT address, amount, spent FROM addresses WHERE address=? ;"
-        self.cursor.execute(sql, (address))
+        cursor.execute(sql, (address))
         return self.cursor.fetchone()
 
     def set_last_hash(self, last_hash):
