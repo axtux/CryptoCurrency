@@ -1,4 +1,4 @@
-# How to compile
+# How to compile and execute
 
 For this project, we'll use Python 3.
 
@@ -25,7 +25,9 @@ The master node also handle GET and POST requests :
 
 # How to launch the program
 
-In a terminal, just type "python3 client.py"
+In a terminal, just type "python3 client.py".
+
+Don't forget to launch the master node, the relay node and the miner.
 
 # How to use the wallet
 

@@ -37,6 +37,13 @@ class Wallet(object):
             self.addr = self.addrList[len(self.addrList)-1]
         self.count = self.blockChain.get_amount_of_address(self.addr)
 
+    def backAddress(self):
+        """Return to the previous address
+        """
+        if len(self.addrList) >= 2:
+            self.addr = self.addrList[len(addrList)-2]
+            self.addrList.pop(self.addrList[len(self.addrList)-1])
+
     def checkUpdate(self):
         """Update the amount and the blockChain
         """
