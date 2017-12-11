@@ -1,7 +1,8 @@
 import hashlib
 import json
 
-from transaction import Transaction
+# local imports
+from lib.transaction import Transaction
 
 class Block:
     DIFFICULTY = 5
@@ -12,32 +13,35 @@ class Block:
         self.miner_address = miner_address
         self.set_transactions(transactions)
 
-    def set_transactions(transactions):
+    def set_transactions(self, transactions):
         # add valid transactions
         self.transactions = []
         for t in transactions:
             if not t.is_valid():
                 continue
-            if len(self.transactions) >= MAX_TRANSACTIONS:
+            if len(self.transactions) >= self.MAX_TRANSACTIONS:
                 break
-            self.transactions.append(i)
+            self.transactions.append(t)
         # update transactions hash
         h = hashlib.sha256()
         for i in self.transactions:
             h.update(i.toJson().encode('utf-8'))
-        self.transactions_hash = h.hexDigest()
+        self.transactions_hash = h.hexdigest()
 
     def set_proof(self, proof):
         # hash previous_hash, miner_address, transactions_hash and proof
-        self.pow = proof
+        self.proof = proof
         h = hashlib.sha256()
         h.update(self.previous_hash.encode('utf-8'))
         h.update(self.miner_address.encode('utf-8'))
         h.update(self.transactions_hash.encode('utf-8'))
         h.update(str(proof).encode('utf-8'))
-        self.hash = h.hexDigest()
+        self.hash = h.hexdigest()
+    
+    def get_hash(self):
+        return self.hash
 
-    def is_valid():
+    def is_valid(self):
         """Check that hash starts with some zeroes
         """
         return self.hash[:DIFFICULTY] == '0'*DIFFICULTY
@@ -52,7 +56,10 @@ class Block:
 
     @staticmethod
     def fromJson(data):
-        data = json.loads(data)
+        try:
+            data = json.loads(data)
+        except TypeError:
+            return None
         b = Block(data["previous_hash"], data["miner_address"])
         ts = []
         for t in data["transactions"]:

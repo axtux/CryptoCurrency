@@ -2,8 +2,10 @@ import math
 import random
 from hashlib import sha256
 from Crypto import Random
-from utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, ripemd_160
 import sqlite3
+
+# local imports
+from lib.utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, ripemd_160
 
 class Address(object):
     """The private and public key for the Wallet
@@ -33,7 +35,7 @@ class Address(object):
         """Load the public / private key from the DB
            The private key is still encrypt with AES in the DB
         """
-        conn = sqlite3.connect('client.db')
+        conn = sqlite3.connect('../databases/client.db')
         cursor = conn.cursor()
         cursor.execute("""SELECT pkey_y, pkey_g, pkey_p, pkey_q, prkey_x FROM addresses WHERE address=?""", (self.address,))
         keys = cursor.fetchone()
@@ -45,7 +47,7 @@ class Address(object):
         """Write the actual key and address on the DB
            Change the previous "actual address" to an "old address"
         """
-        conn = sqlite3.connect('client.db')
+        conn = sqlite3.connect('../databases/client.db')
         cursor = conn.cursor()
         cursor.execute("""INSERT INTO addresses(address,pkey_y,pkey_g,pkey_p,pkey_q,prkey_x) VALUES(?,?,?,?,?,?)""",\
                         (self.address, str(self.privateKey.y), str(self.privateKey.g), str(self.privateKey.p), str(self.privateKey.q), self.privateKey.x))
@@ -55,7 +57,7 @@ class Address(object):
     def generateAddress(self):
         """Create a hash with the Public Key to make an adress
         """
-        return ripemd_160([self.publicKey.y,self.publicKey.gself.publicKey.p,self.publicKey.q])
+        return ripemd_160([str(self.privateKey.y), str(self.privateKey.g), str(self.privateKey.p), str(self.privateKey.q)])
 
 
 if __name__ == '__main__':

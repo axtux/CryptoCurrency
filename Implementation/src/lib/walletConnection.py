@@ -1,11 +1,13 @@
-from utils import sha_256
-from address import Address
-from wallet import Wallet
 import sqlite3
+
+# local imports
+from lib.utils import sha_256
+from lib.address import Address
+from lib.wallet import Wallet
 
 class Connection(object):
     """Wallet connection
-    The user uses it to connect him to his wallet
+       The user uses it to connect him to his wallet
     """
 
     def __init__(self):
@@ -48,7 +50,7 @@ class Connection(object):
            return True when the new user was create, False if the user id was already used
         """
         ret = True
-        conn = sqlite3.connect('client.db')
+        conn = sqlite3.connect('../databases/client.db')
         cursor = conn.cursor()
         try:
             cursor.execute("""INSERT INTO users(ID, hashPass, actualAddress) VALUES(?, ?, ?)""", (id, hashPassword, ""))
@@ -59,6 +61,36 @@ class Connection(object):
             conn.close()
             return ret
 
+    def createDB(self):
+        """Create all using data base
+        """
+        conn = sqlite3.connect('../databases/client.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS addrList (
+        	user_ID	TEXT NOT NULL,
+        	addr	TEXT NOT NULL,
+        	num	INTEGER NOT NULL
+        );""")
+
+        cursor.execute("""
+            CREATE TABLE addresses (
+        	address	TEXT PRIMARY KEY NOT NULL,
+        	pkey_y	TEXT NOT NULL,
+        	pkey_g	TEXT NOT NULL,
+        	pkey_p	TEXT NOT NULL,
+        	pkey_q	TEXT NOT NULL,
+        	prkey_x	BLOB NOT NULL
+        );""")
+
+        cursor.execute("""
+            CREATE TABLE users (
+        	ID	TEXT PRIMARY KEY NOT NULL UNIQUE,
+        	hashPass	TEXT NOT NULL,
+        	actualAddress	TEXT NOT NULL UNIQUE
+        );""")
+        conn.commit()
+        conn.close()
 
 
 if __name__ == '__main__':
