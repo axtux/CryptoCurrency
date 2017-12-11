@@ -53,7 +53,10 @@ class Block:
 
     @staticmethod
     def fromJson(data):
-        data = json.loads(data)
+        try:
+            data = json.loads(data)
+        except ValueError:
+            return None
         b = Block(data["previous_hash"], data["miner_address"])
         ts = []
         for t in data["transactions"]:
