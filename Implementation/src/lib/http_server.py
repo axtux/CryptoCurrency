@@ -6,6 +6,7 @@ from lib.network import Network
 from lib.transaction import Transaction
 from lib.block import Block
 from lib.blockchain import Blockchain
+from lib.http_client import MasterClient, RelayClient
 
 
 class EasyHandler(BaseHTTPRequestHandler):
@@ -20,6 +21,13 @@ class EasyHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'application/json; charset=UTF-8')
         self.end_headers()
         self.wfile.write(bytes(content, 'UTF-8'))
+    
+    def post_body(self):
+        if 'Content-Length' in self.headers:
+            l = self.headers['Content-Length']
+            return self.rfile.read(int(l)).decode('UTF-8')
+        else:
+            return self.rfile.read().decode('UTF-8')
     
     def get_block(self, previous_hash):
         block = self.server.blockchain.get_next_block(previous_hash)
@@ -66,7 +74,7 @@ class MasterHandler(EasyHandler):
             self.no_response(404) # Not Found
 
     def do_POST(self):
-        json = self.rfile.read().decode('UTF-8')
+        json = self.post_body()
         if not self.allowed_client():
             self.no_response(401) # Unauthorized
         elif self.path == '/blocks/':
@@ -75,10 +83,10 @@ class MasterHandler(EasyHandler):
             self.no_response(404) # Not Found
 
 class RelayServer(HTTPServer):
-    def __init__(self, server_address, blockchain, master):
+    def __init__(self, server_address, blockchain):
         super().__init__(server_address, RelayHandler)
         self.blockchain = blockchain
-        self.master = master
+        self.master = MasterClient()
         self.transactions = []
         # HTTP client relays, used to broadcas transactions
         self.relays = []
@@ -126,7 +134,7 @@ class RelayHandler(EasyHandler):
             self.no_response(404) # Not Found
 
     def do_POST(self):
-        json = self.rfile.read().decode('UTF-8')
+        json = self.post_body()
         if self.path == '/blocks/':
             self.post_block(json)
         elif self.path == '/transactions/':
