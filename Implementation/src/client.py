@@ -9,23 +9,24 @@ def showDetails(wallet):
 
 def makeTransaction(wallet):
     clear()
-    addr  = [input("Please, enter the address to send the money\n")]
-    money = [input("Please, enter the amount of money do you want to send to "+addr+"\n")]
+    addr  = input("Please, enter the address to send the money\n")
+    money = input("Please, enter the amount of money do you want to send to "+addr+"\n")
+    receivers = [ (addr,money) ]
     while True:
         again = input("Do you want to make an another transfer in your transaction ? (y or n)")
         while again != 'y' and again != 'n':
             again = input("Do you want to make an another transfer in your transaction ? (y or n)")
         if again == 'y':
-            addr  += [input("Please, enter the address to send the money\n")]
-            money += [input("Please, enter the amount of money do you want to send to "+addr+"\n")]
+            addr  = input("Please, enter the address to send the money\n")
+            money = input("Please, enter the amount of money do you want to send to "+addr+"\n")
+            receivers.append( (addr,money) )
         elif again == 'n':
             print("\n\n\n")
             break
     password = input("Please, enter your password to valid the Transaction\n")
-    isValid = wallet.createTransaction(password, money, addr)
+    isValid = wallet.createTransaction(password, receivers)
     if not isValid:
         print("Sorry, but your Transaction is not valid")
-
 
 def manuel():
     print("This is a list of possible command : \n")
