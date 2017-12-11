@@ -15,7 +15,7 @@ class Block:
 
     def set_transactions(self, transactions):
         # add a maximum of transactions
-        self.transactions = transactions[:MAX_TRANSACTIONS]
+        self.transactions = transactions[:Block.MAX_TRANSACTIONS]
         # update transactions hash
         h = hashlib.sha256()
         for i in self.transactions:
