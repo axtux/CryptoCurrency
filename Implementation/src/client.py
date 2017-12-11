@@ -34,6 +34,12 @@ def manuel():
     print("This is a list of possible command : \n")
     print("show        : Show your Wallet information with the money in your address")
     print("transaction : Create a new transaction")
+    print("back        : Go back to an ald address if your last transaction was not validate")
+
+def backAddress(wallet):
+    """Return to the previous address
+    """
+    wallet.backAddress()
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -76,6 +82,9 @@ if __name__ == '__main__':
             showDetails(wallet)
         if command == 'transaction':
             makeTransaction(wallet)
+        if command == 'back':
+            backAddress(wallet)
+            showDetails(wallet)
         if command == 'man':
             manuel()
         print("\n\n\n")
