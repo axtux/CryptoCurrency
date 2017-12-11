@@ -33,6 +33,9 @@ class Address(object):
         k = self.dsa
         return ripemd_160([str(k.y), str(k.g), str(k.p), str(k.q)])
     
+    def __eq__(self, other):
+        return self.toJson() == other.toJson()
+    
     def public(self):
         return Address(self.dsa.publickey())
     

@@ -20,12 +20,12 @@ def bytesToInt(b):
 def encrypt_AES(key, m, iv):
     """Encrypt a byte string plainText with a key and a random iv
     """
-    return AES.new(key, AES.MODE_CFB, iv).encrypt(m)
+    return bytesToInt(AES.new(key, AES.MODE_CFB, iv).encrypt(m))
 
 def decrypt_AES(key, m, iv):
     """Decrypt a byte string cipherText with a key and a random iv
     """
-    return AES.new(key, AES.MODE_CFB, iv).decrypt(m)
+    return AES.new(key, AES.MODE_CFB, iv).decrypt(intToBytes(m))
 
 def generateAESKey():
     """Generate a random AES-128 key
@@ -47,6 +47,18 @@ def sha_256(text):
         for i in text:
             h.update(i.encode('utf-8'))
     return h.hexdigest()
+
+def sha_256_bytes(text):
+    """hash the content of text
+       text : String or list of String
+    """
+    h = sha256()
+    if type(text) == str:
+        h.update(text.encode('utf-8'))
+    else: #type(text) == list
+        for i in text:
+            h.update(i.encode('utf-8'))
+    return h.digest()
 
 def ripemd_160(text):
     """hash the content of text
@@ -75,19 +87,14 @@ if __name__ == '__main__':
         print("Pas OK")
     """
 
-    """
+
     #AES-128 test
     mess = b'Hello World !'
     # key1 and key2 are the same keys
     key1 = b'Sixteen byte key'
-    key2 = bytes.fromhex("5369787465656e2062797465206b6579")
 
     iv = Random.new().read(AES.block_size)
-    iv2 = Random.new().read(AES.block_size)
-    ci = encrypt_AES(key2, mess, iv)
-    pl = decrypt_AES(key2, ci, iv)
-    print(key1)
-    print(key2)
+    ci = encrypt_AES(key1, mess, iv)
+    pl = decrypt_AES(key1, ci, iv)
     print(ci)
     print(pl)
-    """
