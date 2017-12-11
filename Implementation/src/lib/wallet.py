@@ -21,20 +21,20 @@ class Wallet(object):
         AES_key : The AES key of the user using to encrypt / decrypt his private key
         addr    : The current adress of the user
         """
-        #self.blockChain = Blockchain()
-        #self.relay = RelayClient()
-        #self.updater = Updater(self.blockChain, self.relay)
-        #self.updater.update()
+        self.blockChain = Blockchain()
+        self.relay = RelayClient()
+        self.updater = Updater(self.blockChain, self.relay)
+        self.updater.update()
         self.user_ID = user_ID
-        self.addrList = loadAddressList(self.user_ID)   # list of String address
+        self.addrList = loadAddressList(self.user_ID)   # list of address
         self.last = len(self.addrList)-1    #index of the actual address
         if self.addrList == []:    #New Wallet : Create the first Address
-            self.addr = Address(AES_Key=AES_Key)
-            self.addrList.append(self.addr.address)
+            self.addr = Address()
+            self.addrList.append(self.addr)
         else:
-            self.addr = Address(addr=self.addrList[self.last])
+            self.addr = self.addrList[len(self.addrList)-1]
         #self.count = self.blockChain.get_amount_of_address(self.addr)
-        self.count = 55555
+        self.count = 0
 
     def checkUpdate(self):
         """Update the amount and the blockChain

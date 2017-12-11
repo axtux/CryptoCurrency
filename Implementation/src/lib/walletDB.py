@@ -1,5 +1,6 @@
 import sqlite3
 from lib.utils import buildDSAKey
+from lib.address import fromJson
 
 
 DB_PATH = 'databases/client.db'
@@ -67,7 +68,7 @@ def loadAddressList(user_ID):
     cursor = conn.cursor()
     cursor.execute("""SELECT addr FROM addrList WHERE user_ID=? ORDER BY num""", (user_ID,))
     for addr in cursor.fetchall():
-        addrList.append(addr[0])
+        addrList.append(fromJson(addr[0]))
     conn.close()
     return addrList
 
@@ -77,7 +78,7 @@ def add_address(user_ID, newAddr, num):
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("""INSERT INTO addrList(user_ID, addr, num) VALUES(?,?,?)""", (user_ID, newAddr, num))
+    cursor.execute("""INSERT INTO addrList(user_ID, addr, num) VALUES(?,?,?)""", (user_ID, newAddr.toJson(), num))
     conn.commit()
     conn.close()
 
