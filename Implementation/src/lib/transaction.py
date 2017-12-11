@@ -1,6 +1,6 @@
 import json
 import random
-from lib.utils import sha_256_bytes, ripemd_160
+from lib.utils import sha_256_bytes
 
 """API
 
