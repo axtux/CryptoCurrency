@@ -54,7 +54,7 @@ class Blockchain(object):
 
     def get_amount_of_address(self, address):
         r = self.db.get_address(address)
-        if r == None:
+        if r == None or r[2]: # r[2] is is_spent
             return 0
         return int(r[1])
 
