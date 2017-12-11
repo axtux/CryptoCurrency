@@ -17,7 +17,7 @@ class MasterClient(object):
         """send GET request to self.url/blocks/previous_hash
         """
         r = requests.get(self.url+'blocks/'+previous_hash)
-        if not r.status.code == 200:
+        if not r.status_code == 200:
             return None
         return Block.fromJson(r.text())
 
@@ -25,7 +25,7 @@ class MasterClient(object):
         """send POST request with JSON encoded block to self.url/blocks/
         """
         data = block.toJson()
-        r = requests.post(base_url+'blocks/', data=data)
+        r = requests.post(self.url+'blocks/', data=data)
         if r.status_code == 200:
             return True
         return False
@@ -46,7 +46,7 @@ class RelayClient(MasterClient):
         """send GET request to relay/transactions/ and parse it
         """
         r = requests.get(self.url+'transactions/')
-        if not r.status.code == 200:
+        if not r.status_code == 200:
             return None
         try:
             json_ts = r.json()
@@ -63,7 +63,7 @@ class RelayClient(MasterClient):
         """send POST request with JSON encoded transaction to relay/transactions/
         """
         data = transaction.toJson()
-        r = requests.post(base_url+'transactions/', data=data)
+        r = requests.post(self.url+'transactions/', data=data)
         if r.status_code == 200:
             return True
         return False

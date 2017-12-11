@@ -20,11 +20,11 @@ class Updater(object):
            Stop when blockchain is updated (next block is None)
            Return True if updated, False if not
         """
-        log.debug('updating blockchain')
+        self.log.debug('updating blockchain')
         updated = False
         new_block = self.relay.get_block(self.blockchain.get_last_hash())
         while new_block != None:
-            log.debug('found block '+block.get_hash())
+            self.log.debug('found block '+block.get_hash())
             updated = True
             self.blockChain.add_block(new_block)
             new_block = self.relay.get_block(self.blockchain.get_last_hash())

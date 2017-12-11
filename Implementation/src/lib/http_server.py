@@ -21,7 +21,7 @@ class EasyHandler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header('Content-type', 'application/json; charset=UTF-8')
         self.end_headers()
-        self.wfile.write(bytes(content, 'UTF-8'))
+        self.wfile.write(bytes(json, 'UTF-8'))
     
     def post_body(self):
         if 'Content-Length' in self.headers:
