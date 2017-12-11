@@ -75,8 +75,10 @@ def ripemd_160(text):
 
 
 if __name__ == '__main__':
+
     """
-    #Some test
+     the next lines are some tests of our functions
+    """
     key = DSA.generate(1024)
     m = b"Hello World !"
     sig = key.sign(m, 2)
@@ -86,7 +88,7 @@ if __name__ == '__main__':
         print("Ok")
     else:
         print("Pas OK")
-    """
+
 
 
     password = "veryGoodPassword"

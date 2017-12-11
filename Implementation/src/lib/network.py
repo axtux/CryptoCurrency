@@ -1,5 +1,4 @@
 
-
 class Network(object):
 
     def get_master():

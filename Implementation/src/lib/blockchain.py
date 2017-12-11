@@ -224,7 +224,9 @@ def print_addresses(db):
 
 if __name__ == '__main__':
 
-
+"""
+ the next lines are some tests of our functions
+"""
     conn = sqlite3.connect("databases.blockchain.db")
     cursor = conn.cursor()
     print("deleting DB")

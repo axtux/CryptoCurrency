@@ -5,7 +5,7 @@ from lib.address import Address
 DB_PATH = 'databases/client.db'
 
 def createDB():
-    """Create all using data base
+    """Create all using data bases
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()

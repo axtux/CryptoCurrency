@@ -69,6 +69,12 @@ class Wallet(object):
             return False
 
 if __name__ == '__main__':
+
+
+    """
+     the next lines are some tests of our functions
+    """
+    
     """
     w = Wallet()
     k = w.actualKey

@@ -35,6 +35,10 @@ class Connection(object):
 
 
 if __name__ == '__main__':
+
+    """
+     the next lines are some tests of our functions
+    """
     password = "veryGoodPassword"
     conn = Connection()
     w = conn.allowConnection("prout",password)
