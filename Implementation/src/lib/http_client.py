@@ -11,7 +11,7 @@ class MasterClient(object):
     
     def __init__(self):
         s = Network.get_master()
-        self.url = 'http://'+s[0]+':'+s[1]+'/'
+        self.url = 'http://'+s[0]+':'+str(s[1])+'/'
     
     def get_block(self, previous_hash):
         """send GET request to self.url/blocks/previous_hash
@@ -38,9 +38,9 @@ class RelayClient(MasterClient):
         if relay is None, random relay is chosen from Network
         """
         servers = Network.get_relays()
-        if relay == None
+        if relay == None:
             relay = servers[randint(0, len(servers)-1)]
-        self.url = 'http://'+relay[0]+':'+relay[1]+'/'
+        self.url = 'http://'+relay[0]+':'+str(relay[1])+'/'
 
     def get_transactions(self):
         """send GET request to relay/transactions/ and parse it
@@ -50,7 +50,7 @@ class RelayClient(MasterClient):
             return None
         try:
             json_ts = r.json()
-        except ValueError e:
+        except ValueError:
             return None
         ts = []
         for json in json_ts:
