@@ -346,7 +346,7 @@ if __name__ == '__main__':
     receiver21 = Address()
     receiver22 = Address()
     transactions = [Transaction(sender.public(), ([str(receiver1), str(receiver2)], [10, 300]))]
-    block2 = Block(previousHash, transactions)
+    block2 = Block(previousHash, miner_address, transactions)
     block2.set_proof("222")
 
     blockchain.add_block(block2)
