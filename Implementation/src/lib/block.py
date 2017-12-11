@@ -37,14 +37,14 @@ class Block:
         h.update(self.transactions_hash.encode('utf-8'))
         h.update(str(proof).encode('utf-8'))
         self.hash = h.hexdigest()
-    
+
     def get_hash(self):
         return self.hash
 
     def is_valid(self):
         """Check that hash starts with some zeroes
         """
-        return self.hash[:DIFFICULTY] == '0'*DIFFICULTY
+        return self.hash[:DIFFICULTY] == '0'* DIFFICULTY
 
     def toJson(self):
         return json.dumps({
