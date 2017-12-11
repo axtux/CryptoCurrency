@@ -6,6 +6,7 @@ from hashlib import new as ripemd160
 import random
 import json
 
+
 def generatePrime(n):
      """Generate a N-bit Prime Number
      """
