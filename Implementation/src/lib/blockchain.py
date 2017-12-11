@@ -109,7 +109,8 @@ class BlockchainDatabase(object):
         cursor = self.conn.cursor()
         sql = "SELECT previous_hash, json_block FROM blocks WHERE previous_hash=? ;"
         cursor.execute(sql, (previous_hash))
-        return self.cursor.fetchone()
+        json = self.cursor.fetchone()
+        return Block.fromJson(json)
 
     def get_address(self, address):
         cursor = self.conn.cursor()
