@@ -43,7 +43,7 @@ class Blockchain(object):
     def get_last_hash(self):
         h = self.db.get_last_hash()
         if h == None:
-            return self.FIRST_HASH
+            return Blockchain.FIRST_HASH
         return h
 
     def get_next_block(self, previous_hash):
@@ -70,8 +70,8 @@ class Blockchain(object):
             return False
 
         # add block
-        self.db.set_last_hash(block.hash())
-        self.db.add_json_block(blockchain.db.get_last_hash(), block.toJson())
+        self.db.set_last_hash(block.get_hash())
+        self.db.add_json_block(self.db.get_last_hash(), block.toJson())
 
         # transactions are already checked within block
         for t in block.transactions:
