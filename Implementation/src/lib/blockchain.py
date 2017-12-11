@@ -84,7 +84,7 @@ class Blockchain(object):
         for address, amount in receivers:
             tmp = self.db.get_address(address)
             if tmp == None: # do not exists
-                self.add_address_amount(address, amount, False)
+                self.set_address_amount(address, amount, False)
             else:
                 new_amount = int(tmp[1]) + amount
                 self.db.set_address_amount(address, new_amount)
