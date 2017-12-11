@@ -7,6 +7,20 @@ from lib.transaction import Transaction
 from lib.address import Address
 from lib.miner import Miner
 
+"""API
+get_last_hash(): string
+    last block hash
+get_next_block(previous_hash): Block or None
+    block following previous hash or None (mainly used for servers)
+get_amount_of_address(address): int
+    positive amount (can be 0)
+is_spent(address): boolean
+    return True if address has been used as source (and cannot be used again)
+add_block(block): boolean
+    check and add block to blockchain (also check all transactions)
+    return True on success, False on error
+"""
+
 class Blockchain(object):
     """handle blocks storage and addresses amount database
     for now, this class assumes transactions are valid
