@@ -50,7 +50,7 @@ class Blockchain(object):
         # On update le dernier block et le hash du dernier bloc
         self.last_hash = sha_256(str(block))
         # on rajoute le bloc dans la DB contenant tout les blocs
-        self.db.add_block(blockchain.last_hash, block)
+        self.db.add_json_block(blockchain.last_hash, block.toJson())
         for i in range(len(block.transactions)):
             # Pour chaque transaction, on la rajoute dans la DB des transactions
             self.write_in_transactions_DB(block.previousHash, i, block.transactions[i].amount, block.transactions[i].sender, block.transactions[i].receiver);
@@ -74,7 +74,7 @@ class Blockchain(object):
 
 
     def get_next_block(self, previous_hash):
-        json = self.db.get_block(previous_hash)
+        json = self.db.get_json_block(previous_hash)
         block = Block.fromJson(json)
         return block
 
@@ -103,10 +103,16 @@ class BlockchainDatabase(object):
             spent BOOLEAN DEFAULT NULL
         );""")
     
-    def add_block(self, previous_hash, block):
+    def get_json_block(self, previous_hash):
+        cursor = self.conn.cursor()
+        sql = "SELECT previous_hash, json_block FROM blocks WHERE previous_hash=?"
+        cursor.execute(sql, (previous_hash,))
+        return cursor.fetchone()
+
+    def add_json_block(self, previous_hash, json_block):
         cursor = self.conn.cursor()
         sql = "INSERT INTO blocks (previous_hash, json_block) VALUES (?, ?) ;"
-        cursor.execute(sql, (previous_hash, block.toJson()))
+        cursor.execute(sql, (previous_hash, json_block))
         self.conn.commit()
     
     def add_address(self, address, amount=0, spent=0):
@@ -114,13 +120,6 @@ class BlockchainDatabase(object):
         sql = "INSERT INTO addresses (address, amount, spent) VALUES (?, ?) ;"
         cursor.execute(sql, (address, amount, spent))
         self.conn.commit()
-
-    def get_block(self, previous_hash):
-        cursor = self.conn.cursor()
-        sql = "SELECT previous_hash, json_block FROM blocks WHERE previous_hash=?"
-        cursor.execute(sql, (previous_hash,))
-        json = cursor.fetchone()
-        return Block.fromJson(json)
 
     def get_last_hash(self, last_hash):
         cursor = self.conn.cursor()
