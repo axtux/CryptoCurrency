@@ -57,7 +57,7 @@ class Wallet(object):
             block = self.blockChain.get_next_block(block.get_hash())
         return count
 
-    def createTransaction(self, password, moneyList, destList):
+    def createTransaction(self, password, destList):
         """Create a new transaction and send it to the RelayNode
            moneyList[i] is the value send to the address destList[i]
            The last transaction is the rest of the wallet send to the new user address
@@ -65,16 +65,16 @@ class Wallet(object):
         # TODO
         self.checkUpdate()
         hashPass = sha_256(password)
-        newAddr = Address(AES_Key=hashPass[16:48])
+        newAddr = Address()
         if len(moneyList) == len(destList) and sum(moneyList) <= self.count:
             moneyList.append(self.count - sum(moneyList))
             destList.append(newAddr.address)
-            transac = transaction(self.addr.publicKey, destList, moneyList)
-            transac.sign(self.addr.privateKey)
+            transac = transaction(self.addr.public(), destList)
+            transac.sign(self.addr)
             self.relay.submit_transaction(transac)
-            self.addrList.append(newAddr.address)
+            self.addrList.append(newAddr)
             self.addr = newAddr
-            add_address(self.user_ID, self.addr, len(self.addrList)-1)
+            add_address(self.user_ID, self.addr, len(self.addrList)-1, hashPass[16:48])
             return True
         else:
             return False
