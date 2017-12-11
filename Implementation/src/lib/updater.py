@@ -7,9 +7,12 @@ from lib.address import Address
 from lib.http_client import RelayClient
 
 class Updater(object):
-    def __init__(self, blockchain):
+    def __init__(self, blockchain, relay=None):
         self.blockchain = blockchain
-        self.relay = RelayClient()
+        if relay == None:
+            self.relay = RelayClient()
+        else:
+            self.relay = relay
         self.log = logging.getLogger(__name__)
     
     def update(self):
