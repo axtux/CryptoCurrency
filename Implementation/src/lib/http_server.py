@@ -47,7 +47,7 @@ class MasterServer(HTTPServer):
         self.relays = [r[0] for r in rs]
         print('Server started on '+server_address[0]+':'+str(server_address[1]))
 
-class MasterHandler(BaseHTTPRequestHandler):
+class MasterHandler(EasyHandler):
     error_message_format = ''
 
     def allowed_client(self):
@@ -87,7 +87,7 @@ class RelayServer(HTTPServer):
                 self.relays.append(RelayClient(r))
         print('Server started on '+server_address[0]+':'+str(server_address[1]))
 
-class RelayHandler(BaseHTTPRequestHandler):
+class RelayHandler(EasyHandler):
     error_message_format = ''
     
     def post_block(self, json):
@@ -99,7 +99,7 @@ class RelayHandler(BaseHTTPRequestHandler):
 
     def get_transactions(self):
         json_ts = [t.toJson() for t in self.server.transactions]
-        self.json_response(200, json.dumps(json_ts)
+        self.json_response(200, json.dumps(json_ts))
     
     def post_transaction(self, json):
         t = Transaction.fromJson(json)
