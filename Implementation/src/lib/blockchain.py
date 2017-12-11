@@ -4,6 +4,8 @@ import sqlite3
 from lib.utils import sha_256
 from lib.block import Block
 from lib.transaction import Transaction
+from lib.address import Address
+from lib.miner import Miner
 
 class Blockchain(object):
     """handle blocks storage and addresses amount database
@@ -169,11 +171,32 @@ if __name__ == '__main__':
     print("passed1")
     previousHash = blockchain.get_last_hash()
     print(previousHash)
-    transactions = [Transaction("Sender", "Receiver", 123)]
-    block = Block(previousHash, "Miner", transactions)
+    password = "veryGoodPassword"
+    key = sha_256(password)[:32].encode('utf-8')
+    mess = "bonjour"
+    #iv = iv()
+    password2 = "notSoVeryGoodPassword"
+    key2 = sha_256(password2)[:32].encode('utf-8')
+    mess2 = "bonjour2"
+    #iv = iv()
+    password3 = "notSoVeryGoodPassword"
+    key3 = sha_256(password2)[:32].encode('utf-8')
+    mess3 = "bonjour3"
+    #iv = iv()
+    sender = Address(AES_Key=key)
+    receiver1 = Address(AES_Key=key2)
+    receiver2 = Address(AES_Key=key3)
+    transactions = [Transaction(sender.publicKey, [receiver1.address, receiver2.address], [123, 321])]
+    miner_pasword = "veryGoodPassword"
+    key_miner = sha_256(password)[:32].encode('utf-8')
+    mess_miner = "bonjour"
+    #iv = iv()
+    miner_address = Address(AES_Key=key_miner)
+    miner = Miner(blockchain, miner_address, relay)
+    block = Block(previousHash, miner_address.address, transactions)
     print("passed2")
     blockchain.add_block(block)
-    print("passed2")
+    print("passed3")
     print("printing blockchain\n" + str(blockchain))
     print("printing address list")
     print_addresses(db)
