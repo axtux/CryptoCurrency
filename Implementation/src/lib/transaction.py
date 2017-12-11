@@ -1,5 +1,6 @@
 import json
-
+import random
+from utils import sha_256, ripemd_160
 
 class Transaction(object):
     def __init__(self, sender_public_key, receivers, values):
@@ -13,12 +14,14 @@ class Transaction(object):
            To verify : sender_public_key.verify(m, sigature)
         """
         k = random.randint(2, self.publicKey.q - 1)
-        self.signature = private_key.sign(str(sum(self.values)),k)
+        m = sha_256([str(self.receivers), str(values)])
+        self.signature = private_key.sign(m,k)
 
     def is_signed(self):
         """Return True if the transaction is correctly sign
         """
-        return self.sender_public_key.verify(str(sum(self.values)), self.signature)
+        m = sha_256([str(self.receivers), str(values)])
+        return self.sender_public_key.verify(m, self.signature)
 
     def is_valid(self):
         """Return true if sender address has enough amount
@@ -26,6 +29,11 @@ class Transaction(object):
         """
         # TODO
         return self.is_signed()
+
+    def senderAddress(self):
+        """Return the sender address from the public key
+        """
+        return ripemd_160([str(self.privateKey.y), str(self.privateKey.g), str(self.privateKey.p), str(self.privateKey.q)])
 
     def toJson(self):
         return json.dumps({

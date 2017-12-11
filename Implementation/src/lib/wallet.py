@@ -5,6 +5,7 @@ import sqlite3
 from blockchain import Blockchain
 from utils import sha_256
 from address import Address
+from http_client import RelayClient
 
 class Wallet(object):
     """Wallet is the principal user
@@ -18,8 +19,9 @@ class Wallet(object):
         AES_key : The AES key of the user using to encrypt / decrypt his private key
         addr    : The current adress of the user
         """
+        self.relayNode = RelayNode()
         self.user_ID = user_ID
-        self.blockChain = Blockchain
+        self.blockChain = Blockchain()
         self.updateBlockchain()
         self.addrList = []
         self.loadAddressList()
@@ -38,10 +40,10 @@ class Wallet(object):
            Stop when the Blockchain is valid (next block is None)
         """
         lastBlock = self.blockChain.get_last_block()
-        #newBlock = TODO ask to the relay node the nex block
+        newBlock = self.relay.get_block(lastBlock.get_hash())
         while newBlock != None:
             self.blockChain.add_block(newBlock)
-            #newBlock = TODO ask to the relay node the nex block
+            newBlock = self.relay.get_block(lastBlock.get_hash())
 
     def checkCount(self):
         """Check, with the actual address, the Wallet value in the BlockChain
