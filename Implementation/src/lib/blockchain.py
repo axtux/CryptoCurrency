@@ -53,8 +53,8 @@ class Blockchain(object):
         return Block.fromJson(json)
 
     def get_amount_of_address(self, address):
-        r = self.db.get_address(address)
-        if r == None or r[2]: # r[2] is is_spent
+        r = self.db.get_address(str(address))
+        if r is None or r[2]: # r[2] is is_spent
             return 0
         return int(r[1])
 
