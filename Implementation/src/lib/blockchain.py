@@ -118,17 +118,17 @@ class BlockchainDatabase(object):
             spent BOOLEAN DEFAULT NULL
         );""")
     
-    def fetch_one(sql, params=None)
+    def fetch_one(sql, params=None):
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
         return cursor.fetchone()
     
-    def fetch_all(sql, params=None)
+    def fetch_all(sql, params=None):
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
         return cursor.fetchall()
     
-    def commit(sql, params=None)
+    def commit(sql, params=None):
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
         elf.conn.commit()
