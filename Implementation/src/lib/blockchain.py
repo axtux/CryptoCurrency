@@ -15,10 +15,7 @@ class Blockchain(object):
 
     def __init__(self):
         self.db = BlockchainDatabase("blockchain")
-        self.last_hash = self.get_last_hash()
-        if self.last_hash == None:
-            self.last_hash = FIRST_HASH
-        print('last hash: '+self.last_hash)
+        print('initated BDD, last hash: '+self.get_last_hash())
 
     def __repr__(self):
         temp = "\n"
@@ -30,23 +27,31 @@ class Blockchain(object):
             hash_temp = next_block.get_hash()
         return temp + "\n"
 
-    def get_last_block(self):
-        return self._last_block
-
     def get_last_hash(self):
-        hash_ = self.FIRST_HASH
-        block = self.get_next_block(hash_)
-        while block != None:
-            hash_ = sha_256(block)
-            block = self.get_next_block(hash_)
-        return hash_
+        h = self.db.get_last_hash()
+        if h == None:
+            return self.FIRST_HASH
+
+    def get_next_block(self, previous_hash):
+        json = self.db.get_json_block(previous_hash)
+        if json == None:
+            return None
+        return Block.fromJson(json)
 
     def get_amount_of_address(self, address):
         r = self.db.get_address(address)
-        # TODO: handle if not exists
+        if r == None:
+            return 0
         return int(r[1])
 
+    def is_spent(self, address):
+        r = self.db.get_address(address)
+        if r == None:
+            return False
+        return bool(r[2])
+
     def add_block(self, block):
+        # TODO: english comments
         # On update le dernier block et le hash du dernier bloc
         self.last_hash = sha_256(str(block))
         # on rajoute le bloc dans la DB contenant tout les blocs
@@ -71,12 +76,8 @@ class Blockchain(object):
                 temp_amount = int(temp[1]) - block.transactions[i].amount
                 self.db.set_address_amount(block.transactions[i].sender, temp_amount)
                 self.db.set_address_spent(block.transactions[i].sender, True)
+        self.db.set_last_hash(block.hash())
 
-
-    def get_next_block(self, previous_hash):
-        json = self.db.get_json_block(previous_hash)
-        block = Block.fromJson(json)
-        return block
 
 class BlockchainDatabase(object):
     def __init__(self, name):
