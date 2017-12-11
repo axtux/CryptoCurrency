@@ -1,8 +1,10 @@
 import lib.utils
 import lib.block
 import random
+import sys
 import lib.blockchain
 import lib.updater
+from lib.network import Network
 class Miner:
 
     FLAG=10 #number of iteration of mining before check if the block has been found
@@ -56,3 +58,17 @@ class Miner:
 
     def randompow(self,previousPow=0):
         return random.randint(0,2**256)
+
+if __name__ == '__main__':
+    argc = len(sys.argv)
+    if not argc == 3:
+        exit('usage: python3 '+sys.argv[0]+' YOUR_ADDRESS + RELAY_NUMBER' )
+    relays = Network.get_relays()
+    n = len(relays)
+    i = int(sys.argv[2]) % n
+    print('Starting miner with address '+str(sys.argv[1])+' and with relay number'+str(sys.argv[2]))
+    b = Blockchain()
+    miner=Miner(b,sys.argv[1],relays[i])
+    miner.run()
+
+    # TODO update blockchain in background or receive pushes from server
