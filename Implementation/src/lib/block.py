@@ -47,7 +47,7 @@ class Block:
     def is_valid(self):
         """Check that hash starts with some zeroes
         """
-        return self.hash[:DIFFICULTY] == '0'* DIFFICULTY
+        return self.hash[:Block.DIFFICULTY] == '0'* Block.DIFFICULTY
 
     def toJson(self):
         return json.dumps({
