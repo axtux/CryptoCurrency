@@ -130,15 +130,16 @@ class BlockchainDatabase(object):
         self.conn.commit()
 
 def print_blocks(db):
-    self.cursor.execute("SELECT hash_of_previous_block, proof_of_work , difficulty FROM Blockchain_blocks")
-    rows = self.cursor.fetchall()
+    cursor = db.conn.cursor()
+    cursor.execute("SELECT * FROM blocks")
+    rows = cursor.fetchall()
     for row in rows:
         print("block:")
         print(row[0])
         print(row[1])
         print(row[2])
-        self.cursor.execute("SELECT hash_of_previous_block, id , amount , sender, receiver FROM Blockchain_transactions WHERE hash_of_previous_block=?", (row[0],))
-        transactions = self.cursor.fetchall()
+        # with a block, call block.transactions
+        transactions = []
         for transaction in transactions:
             print("transaction:")
             print(transaction[1])
@@ -146,11 +147,11 @@ def print_blocks(db):
             print(transaction[3])
             print(transaction[4])
             print("\n")
-    self.conn.commit()
 
-def print_Blockchain_address(blockchain):
-    blockchain.cursor.execute("SELECT address, money_of_address , flag FROM Blockchain_address")
-    rows = blockchain.cursor.fetchall()
+def print_addresses(db):
+    cursor = db.conn.cursor()
+    cursor.execute("SELECT * FROM addresses")
+    rows = cursor.fetchall()
     for row in rows:
         if bool(row[2]) == False:
             temp = "This address has not been used"
@@ -171,7 +172,7 @@ if __name__ == '__main__':
     blockchain.add_block(block)
     print("printing blockchain\n" + str(blockchain))
     print("printing address list")
-    print_Blockchain_address(blockchain)
+    print_addresses(db)
     print("finished printing address list")
 
 
@@ -186,7 +187,7 @@ if __name__ == '__main__':
     blockchain.add_block(block2)
     print(blockchain)
     print("printing adresses")
-    print_Blockchain_address(blockchain)
+    print_addresses(db)
 
     print(blockchain.get_amount_of_address("A"))
     print(blockchain.get_last_hash())
