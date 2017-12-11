@@ -56,6 +56,13 @@ class Test(unittest.TestCase):
         t.receivers = [('lui', 3), ('elle', 3)]
         self.assertFalse(t.is_signed())
     
+    def test_valid(self):
+        a = Address()
+        bc = TestBlockchain()
+        rs = [('lui', 7), ('elle', 3)]
+        t = Transaction(a.public(), rs)
+        self.assertFalse(t.is_signed())
+    
     def test_not_valid(self):
         a = Address()
         bc = TestBlockchain()
