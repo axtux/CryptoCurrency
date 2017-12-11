@@ -257,7 +257,7 @@ if __name__ == '__main__':
     sender = Address()
     receiver1 = Address()
     receiver2 = Address()
-    transactions = [Transaction(sender.public(), [str(receiver1), str(receiver2)], [123, 321])]
+    transactions = [Transaction(sender.public(), ([str(receiver1), str(receiver2)], [123, 321]))]
     #iv = iv()
     miner_address = Address()
     block = Block(previousHash, str(miner_address), transactions)
