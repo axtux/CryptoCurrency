@@ -1,9 +1,9 @@
 import sqlite3 
 
 # local imports
-from utils import sha_256
-from block import Block
-from transaction import Transaction
+from lib.utils import sha_256
+from lib.block import Block
+from lib.transaction import Transaction
 
 class Blockchain(object):
     """handle blocks storage and addresses amount database
