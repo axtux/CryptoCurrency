@@ -55,14 +55,17 @@ class Block:
             })
 
     @staticmethod
-    def fromJson(data):
+    def fromJson(json_data):
         try:
-            data = json.loads(data)
-        except TypeError:
+            data = json.loads(json_data)
+            b = Block(data["previous_hash"], data["miner_address"])
+            ts = []
+            for t in data["transactions"]:
+                ts.append(Transaction.fromJson(t))
+            b.set_transactions(ts)
+            b.set_proof(data["proof"])
+            return b
+        # JSON ValueError for decode
+        # KeyError if no accessed key
+        except (ValueError, KeyError, TypeError):
             return None
-        b = Block(data["previous_hash"], data["miner_address"])
-        ts = []
-        for t in data["transactions"]:
-            ts.append(Transaction.fromJson(t))
-        b.set_transactions(ts)
-        return b
