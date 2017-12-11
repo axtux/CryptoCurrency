@@ -29,7 +29,7 @@ class Address(object):
     def generateAddress(self):
         """Create a hash with the Public Key to make an adress
         """
-        return ripemd_160([str(self.privateKey.y), str(self.privateKey.g), str(self.privateKey.p), str(self.privateKey.q)])
+        return ripemd_160([str(self.publicKey.y), str(self.publicKey.g), str(self.publicKey.p), str(self.publicKey.q)])
 
 
 if __name__ == '__main__':

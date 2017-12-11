@@ -28,7 +28,7 @@ class Connection(object):
             if newUser(user_ID, hashPass[:16] + hashPass[48:]):
                 return Wallet(user_ID, AES_Key=hashPass[16:48])
         else:
-            if userExist(user_ID, hashPass[:16] + hashPass[48:])
+            if userExist(user_ID, hashPass[:16] + hashPass[48:]):
                 return Wallet(user_ID)
         return None
 
