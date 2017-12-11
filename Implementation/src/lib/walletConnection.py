@@ -2,7 +2,6 @@ import sqlite3
 
 # local imports
 from lib.utils import sha_256
-from lib.address import Address
 from lib.wallet import Wallet
 from lib.walletDB import createDB, userExist, newUser
 
@@ -18,7 +17,7 @@ class Connection(object):
     def allowConnection(self, user_ID, password, newWallet=False):
         """Create or connecte to a wallet
 
-        id          : The identification of the user
+        user_ID     : The identification of the user
         password    : The password of the user
         newWallet   : True to create a new wallet with these information
                       False to connecte to user to his Wallet
