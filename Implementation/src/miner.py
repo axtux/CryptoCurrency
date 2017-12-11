@@ -6,6 +6,8 @@ from lib.blockchain import Blockchain
 import lib.updater
 from lib.network import Network
 from lib.http_client import RelayClient
+from lib.updater import Updater
+
 class Miner:
 
     FLAG=10 #number of iteration of mining before check if the block has been found
@@ -30,7 +32,7 @@ class Miner:
         self.create_block()
         while(1):
             if(self.flag == 0): #Check if a new block has been found
-                self.flag = FLAG
+                self.flag = 10
                 if self.update_blockchain(): # New block has been found
                     self.create_block()
             else:
@@ -49,7 +51,7 @@ class Miner:
         return False
 
     def mine(self,strategy):
-        digest = self.block.set_proof(strategy(self.bloc.pow))
+        digest = self.block.set_proof(strategy(self.block.proof))
 
     def increasepow(self,previousPow=0):
         return previousPow+1

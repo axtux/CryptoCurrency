@@ -21,7 +21,7 @@ class MasterClient(object):
         except ConnectionRefusedError:
             print('http error')
             return None
-        if not r.status.code == 200:
+        if not r.status_code == 200:
             return None
         return Block.fromJson(r.text())
 
@@ -30,7 +30,7 @@ class MasterClient(object):
         """
         data = block.toJson()
         try:
-            r = requests.post(base_url+'blocks/', data=data)
+            r = requests.post(self.url+'blocks/', data=data)
         except ConnectionRefusedError:
             print('http error')
             return False
@@ -76,7 +76,7 @@ class RelayClient(MasterClient):
         """
         data = transaction.toJson()
         try:
-            r = requests.post(base_url+'transactions/', data=data)
+            r = requests.post(self.url+'transactions/', data=data)
         except ConnectionRefusedError:
             print('http error')
             return False
