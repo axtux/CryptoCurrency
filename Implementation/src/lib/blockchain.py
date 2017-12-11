@@ -88,6 +88,12 @@ class BlockchainDatabase(object):
             previous_hash TEXT PRIMARY KEY NOT NULL,
             json_block TEXT NOT NULL
         );""")
+        
+        # last_hash
+        self.conn.execute("""
+            CREATE TABLE IF NOT EXISTS last_hash (
+            hash TEXT PRIMARY KEY NOT NULL
+        );""")
 
         # addresses with amount and spent flag
         self.conn.execute("""
@@ -99,7 +105,8 @@ class BlockchainDatabase(object):
     
     def add_block(self, previous_hash, block):
         cursor = self.conn.cursor()
-        cursor.execute("INSERT INTO blocks (previous_hash, json_block) VALUES (?, ?)", (previous_hash, block.toJson()));
+        sql = "INSERT INTO blocks (previous_hash, json_block) VALUES (?, ?) ;"
+        cursor.execute(sql, (previous_hash, block.toJson()))
         self.conn.commit()
     
     def add_address(self, address, amount=0, spent=0):
@@ -110,15 +117,27 @@ class BlockchainDatabase(object):
 
     def get_block(self, previous_hash):
         cursor = self.conn.cursor()
-        cursor.execute("SELECT previous_hash, json_block FROM blocks WHERE previous_hash=?", (previous_hash, ))
+        sql = "SELECT previous_hash, json_block FROM blocks WHERE previous_hash=?"
+        cursor.execute(sql, (previous_hash,))
         json = cursor.fetchone()
         return Block.fromJson(json)
+
+    def get_last_hash(self, last_hash):
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT hash FROM last_hash", (last_hash,))
+        return = cursor.fetchone()
 
     def get_address(self, address):
         cursor = self.conn.cursor()
         sql = "SELECT address, amount, spent FROM addresses WHERE address=? ;"
         self.cursor.execute(sql, (address))
         return self.cursor.fetchone()
+
+    def set_last_hash(self, last_hash):
+        cursor = self.conn.cursor()
+        sql = "UPDATE last_hash SET hash=?"
+        self.cursor.execute(sql, (last_hash,))
+        self.conn.commit()
 
     def set_address_amount(self, address, amount):
         cursor = self.conn.cursor()
