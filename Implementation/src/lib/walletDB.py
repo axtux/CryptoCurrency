@@ -1,6 +1,5 @@
 import sqlite3
-import lib.address
-from copy import deepcopy
+from lib.address import Address
 
 
 DB_PATH = 'databases/client.db'
@@ -34,7 +33,7 @@ def loadAddressList(user_ID):
     cursor = conn.cursor()
     cursor.execute("""SELECT addr FROM addrList WHERE user_ID=? ORDER BY num""", (user_ID,))
     for addr in cursor.fetchall():
-        addrList.append(fromJson(addr[0]))
+        addrList.append(Address.fromJson(addr[0]))
     conn.close()
     return addrList
 
@@ -44,8 +43,7 @@ def add_address(user_ID, newAddr, num):
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    tmp = deepcopy(newAddr)
-    cursor.execute("""INSERT INTO addrList(user_ID, addr, num) VALUES(?,?,?)""", (user_ID, tmp.toJson(), num))
+    cursor.execute("""INSERT INTO addrList(user_ID, addr, num) VALUES(?,?,?)""", (user_ID, newAddr.toJson(), num))
     conn.commit()
     conn.close()
 

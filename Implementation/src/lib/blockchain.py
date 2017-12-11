@@ -65,18 +65,27 @@ class Blockchain(object):
         return bool(r[2])
 
     def add_block(self, block):
-        # TODO: english comments
-        # On update le dernier block et le hash du dernier bloc
-        # on rajoute le bloc dans la DB contenant tout les blocs
-        self.db.set_last_hash(sha_256(str(block)))
+        # check transactions validity
+        if not block.is_valid(self):
+            return False
+        
+        # add block
+        self.db.set_last_hash(block.hash())
         self.db.add_json_block(blockchain.db.get_last_hash(), block.toJson())
-        for i in range(len(block.transactions)):
-            print(type(block.transactions[i].sender_public_key))
-            temp = self.db.get_address(block.transactions[i].senderAddress())
-            if temp == None:
-            # On cherche si l'addresse d'envoi existe deja. Si non on la rajoute et on met le bon flag
-                self.db.add_address(block.transactions[i].sender, block.transactions[i].amount, True);
+        
+        # transactions are already checked within block
+        for t in block.transactions:
+            sender = t.senderAddress()
+            self.db.set_address_spent(sender, True)
+            self.update_addresses_amount(t.receivers)
+    
+    def update_addresses_amount(self, receivers):
+        for address, amount in receivers:
+            tmp = self.db.get_address(address)
+            if tmp == None: # do not exists
+                self.add_address_amount(address, amount, False)
             else:
+<<<<<<< HEAD
             # Si oui, on update la valeur et on met le bon flag
                 temp_amount = int(temp[1]) - block.transactions[i].amount
                 self.db.set_address_amount(block.transactions[i].sender, temp_amount)
@@ -92,6 +101,10 @@ class Blockchain(object):
                     self.db.set_address_amount(block.transactions[i].receiver, temp_amount)
 
             self.db.set_last_hash(block.hash())
+=======
+                new_amount = int(tmp[1]) + amount
+                self.db.set_address_amount(address, new_amount)
+>>>>>>> 232c18d9a0f901d32f4f7314e2e73f6905d053ba
 
 
 class BlockchainDatabase(object):

@@ -6,7 +6,7 @@ import os
 def showDetails(wallet):
     print(wallet.user_ID)
     #wallet.checkUpdate()
-    print(wallet.addr.address + " => " + str(wallet.count))
+    print(str(wallet.addr) + " => " + str(wallet.count))
     print("\n\n\nIt's possible that this value was not up-to-date. Please, want some minutes to validate the last transaction")
 
 def makeTransaction(wallet):
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     clear()
     password = input("Please, enter your password\n")
     clear()
-    isNew = isNew == 'y'    #True if 'y', False if 'n'
+    isNew = (isNew == 'y')    #True if 'y', False if 'n'
     wallet = conn.allowConnection(user_ID, password, isNew)
     while wallet == None:
         print("You make a mistake, please retry")
@@ -79,7 +79,6 @@ if __name__ == '__main__':
         clear()
         password = input("Please, enter your password again\n")
         clear()
-        isNew = (isNew == 'y')    #True if 'y', False if 'n'
         wallet = conn.allowConnection(user_ID, password, isNew)
 
     command = 'show'
