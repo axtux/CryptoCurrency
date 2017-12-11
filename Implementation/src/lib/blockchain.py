@@ -1,8 +1,9 @@
-from utils import sha_256
-from block import Block
-from transaction import Transaction
 import sqlite3 
 
+# local imports
+from lib.utils import sha_256
+from lib.block import Block
+from lib.transaction import Transaction
 
 """ Toutes cette classe se base sur le fait que toutes les transactions que l'on veut faire sont effectivement correcte.
 Je peut rajouter un controle en plus si il faut"""

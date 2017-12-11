@@ -1,7 +1,8 @@
 import hashlib
 import json
 
-from transaction import Transaction
+# local imports
+from lib.transaction import Transaction
 
 class Block:
     DIFFICULTY = 5

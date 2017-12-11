@@ -1,8 +1,10 @@
 import random
-from bloackchain import Blockchain
-from utils import sha_256
 import sqlite3
-from address import Address
+
+# local imports
+from lib.blockchain import Blockchain
+from lib.utils import sha_256
+from lib.address import Address
 
 class Wallet(object):
     """Wallet is the principal user

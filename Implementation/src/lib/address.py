@@ -2,8 +2,10 @@ import math
 import random
 from hashlib import sha256
 from Crypto import Random
-from utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, ripemd_160
 import sqlite3
+
+# local imports
+from lib.utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, ripemd_160
 
 class Address(object):
     """The private and public key for the Wallet

@@ -1,7 +1,9 @@
-from utils import sha_256
-from address import Address
-from wallet import Wallet
 import sqlite3
+
+# local imports
+from lib.utils import sha_256
+from lib.address import Address
+from lib.wallet import Wallet
 
 class Connection(object):
     """Wallet connection
