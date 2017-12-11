@@ -8,11 +8,11 @@ from lib.block import Block
 
 
 class MasterClient(object):
-    
+
     def __init__(self):
         s = Network.get_master()
         self.url = 'http://'+s[0]+':'+str(s[1])+'/'
-    
+
     def get_block(self, previous_hash):
         """send GET request to self.url/blocks/previous_hash
         """
@@ -40,9 +40,9 @@ class MasterClient(object):
 
 
 class RelayClient(MasterClient):
-    
+
     def __init__(self, relay=None):
-        """initialite an http client to request the relay server
+        """initialize an http client to request the relay server
         if relay is None, random relay is chosen from Network
         """
         servers = Network.get_relays()

@@ -36,7 +36,7 @@ class Block:
         return self.hash
 
     def is_valid(self, blockchain):
-        """Check that hash starts with some zeroes
+        """Check that hash starts with some zeros
         and that addresses are valid
         """
         for t in transacitons:
