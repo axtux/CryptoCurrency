@@ -2,7 +2,7 @@ import random
 import sqlite3
 
 # local imports
-#from blockchain import Blockchain
+from blockchain import Blockchain
 from utils import sha_256
 from address import Address
 
@@ -19,7 +19,8 @@ class Wallet(object):
         addr    : The current adress of the user
         """
         self.user_ID = user_ID
-        #self.bloackChain = self.askCopyChain()
+        self.blockChain = Blockchain
+        self.updateBlockchain()
         self.addrList = []
         self.loadAddressList()
         self.last = len(self.addrList)-1    #index of the actual address
@@ -31,23 +32,36 @@ class Wallet(object):
             self.addr = Address(addr=self.addrList[self.last])
         self.count = self.checkCount()
 
-    def askCopyChain(self):
-        """Ask to the RelayNode a valid copy of the blockchain
+    def updateBlockchain(self):
+        """Update the Blockchain
+           Ask to the relay node the next block from the actual version of the blockchain
+           Stop when the Blockchain is valid (next block is None)
         """
-        # TODO
-        return Blockchain()
+        lastBlock = self.blockChain.get_last_block()
+        #newBlock = TODO ask to the relay node the nex block
+        while newBlock != None:
+            self.blockChain.add_block(newBlock)
+            #newBlock = TODO ask to the relay node the nex block
 
     def checkCount(self):
         """Check, with the actual address, the Wallet value in the BlockChain
         """
-        # TODO Ask to the relay node a copy of the BlockChain
-        return 0
+        count = 0
+        block = self.blockChain.get_next_block(self.blockChain.FIRST_HASH)
+        while block != None:
+            for trans in block.transactions:
+                for dest,val in trans.receiver,trans.values:
+                    if dest == self.addr.address:
+                        count += val
+            block = self.blockChain.get_next_block(block.get_hash())
+        return count
 
     def createTransaction(self, moneyList, destList, AES_Key):
         """Create a new transaction and send it to the RelayNode
            moneyList[i] is the value send to the address destList[i]
            The last transaction is the rest of the wallet send to the new user address
         """
+        # TODO
         newAddr = Address(AES_Key=AES_Key)
         if len(moneyList) == len(destList) and sum(moneyList) <= self.count:
             moneyList.append(self.count - sum(moneyList))
