@@ -50,7 +50,7 @@ class Connection(object):
            return True when the new user was create, False if the user id was already used
         """
         ret = True
-        conn = sqlite3.connect('client.db')
+        conn = sqlite3.connect('../databases/client.db')
         cursor = conn.cursor()
         try:
             cursor.execute("""INSERT INTO users(ID, hashPass, actualAddress) VALUES(?, ?, ?)""", (id, hashPassword, ""))

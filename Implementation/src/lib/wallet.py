@@ -2,9 +2,9 @@ import random
 import sqlite3
 
 # local imports
-from lib.blockchain import Blockchain
-from lib.utils import sha_256
-from lib.address import Address
+#from blockchain import Blockchain
+from utils import sha_256
+from address import Address
 
 class Wallet(object):
     """Wallet is the principal user
@@ -14,16 +14,21 @@ class Wallet(object):
     def __init__(self, user_ID, AES_Key=None, addr=None):
         """Create a new wallet
 
+        user_ID : The ID of the user to select it's own address on the DB
         AES_key : The AES key of the user using to encrypt / decrypt his private key
         addr    : The current adress of the user
         """
         self.user_ID = user_ID
-        self.bloackChain = self.askCopyChain()
-        if addr == None:    #New Wallet : Create the first Address
+        #self.bloackChain = self.askCopyChain()
+        self.addrList = []
+        self.loadAddressList()
+        self.last = len(self.addrList)-1    #index of the actual address
+        if self.addrList == []:    #New Wallet : Create the first Address
             self.addr = Address(AES_Key=AES_Key)
+            self.addrList.append(self.addr.address)
             self.defineActualAddress(self.addr)
         else:
-            self.addr = Address(addr=addr)
+            self.addr = Address(addr=self.addrList[self.last])
         self.count = self.checkCount()
 
     def askCopyChain(self):
@@ -51,20 +56,24 @@ class Wallet(object):
             #network.postTransaction(transac)
             self.defineActualAddress(newAddr)
 
-    def signature(self, m):
-        """return the Public Key object and the result of the signature
-        To verify : publicKey.verify(m, signature)
-        (see Crypto.PublicKey.DSA lib)
+    def loadAddressList(self):
+        """Load a list with all address from the user
         """
-        return self.actualKey.publicKey, self.actualKey.signature(m)
+        conn = sqlite3.connect('../databases/client.db')
+        cursor = conn.cursor()
+        cursor.execute("""SELECT addr FROM addrList WHERE user_ID=? ORDER BY num""", (self.user_ID,))
+        for addr in cursor.fetchall():
+            self.addrList.append(addr[0])
+        conn.close()
 
     def defineActualAddress(self, newAddr):
         """Define the newAddr as the actual address of the user
            Change it in the DB
         """
-        conn = sqlite3.connect('client.db')
+        conn = sqlite3.connect('../databases/client.db')
         cursor = conn.cursor()
         cursor.execute("""UPDATE users SET actualAddress=? WHERE ID=?""", (newAddr.address, self.user_ID))
+        cursor.execute("""INSERT INTO addrList(user_ID, addr, num) VALUES(?,?,?)""", (self.user_ID, newAddr.address, len(self.addrList)))
         conn.commit()
         conn.close()
         self.addr = newAddr
@@ -85,8 +94,5 @@ if __name__ == '__main__':
     password = "veryGoodPassword"
     print(sha_256(password)[:32])
 
-    w = Wallet(AES_Key=sha_256(password)[:32])
-    print(w.addr)
-    newAddr = Address()
-    w.defineActualAddress(newAddr)
-    print(w.addr)
+    w = Wallet("prout", AES_Key=sha_256(password)[:32])
+    print(w.addrList)
