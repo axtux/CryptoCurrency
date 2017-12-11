@@ -2,10 +2,10 @@ import random
 import sqlite3
 
 # local imports
-from blockchain import Blockchain
-from utils import sha_256
-from address import Address
-from http_client import RelayClient
+from lib.blockchain import Blockchain
+from lib.utils import sha_256
+from lib.address import Address
+from lib.http_client import RelayClient
 
 class Wallet(object):
     """Wallet is the principal user

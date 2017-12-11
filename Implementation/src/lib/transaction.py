@@ -1,6 +1,6 @@
 import json
 import random
-from utils import sha_256, ripemd_160
+from lib.utils import sha_256, ripemd_160
 
 class Transaction(object):
     def __init__(self, sender_public_key, receivers, values):
