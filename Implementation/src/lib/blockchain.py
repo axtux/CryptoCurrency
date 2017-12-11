@@ -7,7 +7,7 @@ import sqlite3
 """ Toutes cette classe se base sur le fait que toutes les transactions que l'on veut faire sont effectivement correcte.
 Je peut rajouter un controle en plus si il faut"""
 
-class Blockchain:
+class Blockchain(object):
     count = 0
     first_hash = sha_256("42")
 
@@ -41,9 +41,10 @@ class Blockchain:
             flag BOOLEAN DEFAULT NULL
         );""")
         if Blockchain.count == 0:
-            self._last_block = Block(self.first_hash)
-            self.add_block(self._last_block)
-            self._last_hash = sha_256(str(self._last_block))
+            #self._last_block = Block(self.first_hash)
+            #self.add_block(self._last_block)
+            #self._last_hash = sha_256(str(self._last_block))
+            self._last_hash = self.first_hash
         print("Finished initialising blockchain\n")
 
     def __repr__(self):
