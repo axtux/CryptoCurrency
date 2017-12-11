@@ -64,7 +64,7 @@ class Blockchain(object):
         return bool(r[2])
 
     def add_block(self, block):
-        # TODO: english comments
+        # check transactions validity
         if not block.is_valid(self):
             return False
         
