@@ -168,10 +168,9 @@ if __name__ == '__main__':
     blockchain = Blockchain()
     print("passed1")
     previousHash = blockchain.get_last_hash()
-    transaction_1 = Transaction(123, "A", "B")
-    transaction_2 = Transaction(234324, "Z", "T")
-    transactions = [transaction_1, transaction_2]
-    block = Block(previousHash, transactions)
+    print(previousHash)
+    transactions = [Transaction("Sender", "Receiver", 123)]
+    block = Block(previousHash, "Miner", transactions)
     print("passed2")
     blockchain.add_block(block)
     print("passed2")
