@@ -18,6 +18,9 @@ For the communication between the client and the server, we use the http protoco
 
 The user has to give a login and a password to use the wallet. If the user doesn't exist, a new wallet for this user is automatically created ant the wallet download the blockchain. Otherwise, the user is connected to his wallet and the blockchain is updated.
 
-If the wallet countains some coins, the user is able to make some transactions. The network doesn't allow transactions of 0 coin or negative transactions (ie Alice sent -3 coins to Bob is not possible).
+If the wallet countains some coins, the user is able to make some transactions. The network doesn't allow transactions of less than 1 coin or negative transactions (ie Alice can not send -3 coins or 0.5 to Bob). Obviously, he can not sent more coins than he has in his wallet.
 
-Before each transaction, a new adress (a public key and a private key) is generated for the wallet. Once the transaction is done, the new adress is stored in the local database.
+To make a transaction, the user must type the command 'transaction'. Then he has to specify the address of the receiver and the amount he wants to send.
+If the transaction fullfill the conditions of the above paragraph, a new adress (a public key and a private key) is generated for the wallet. 
+
+After those steps, the transaction is submitted to a relay node and the new adress of the wallet is stored in the local database.
