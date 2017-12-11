@@ -25,7 +25,7 @@ class Transaction(object):
         m = sha_256([str(self.receivers), str(self.values)])
         return self.sender_public_key.verify(m, self.signature)
         """
-        Return True
+        return True
 
     def is_valid(self):
         """Return true if sender address has enough amount
