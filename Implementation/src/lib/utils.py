@@ -5,7 +5,35 @@ from Crypto import Random
 from hashlib import sha256
 from hashlib import new as ripemd160
 import random
+import json
 
+def DSAtoJSON(dsa):
+    data = {}
+    # public key fields
+    data['y'] = dsa.y
+    data['g'] = dsa.g
+    data['p'] = dsa.p
+    data['q'] = dsa.q
+    # private key (optionnal)
+    try:
+        data['x'] = dsa.x
+    except AttributeError:
+        pass
+    return json.dumps(data)
+
+def JSONtoDSA(json_dsa):
+    try:
+        data = json.loads(json_dsa)
+        if ('x' in data): # private key
+            t = (data['y'], data['g'], data['p'], data['q'], data['x'])
+        else: # only public key
+            t = (data['y'], data['g'], data['p'], data['q'])
+        return DSA.construct(t)
+    # JSON ValueError for decode
+    # KeyError if no accessed key
+    # DSA TypeError if not int
+    except (ValueError, KeyError, TypeError):
+        return None
 
 def generatePrime(n):
      """Generate a N-bit Prime Number
