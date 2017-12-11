@@ -19,7 +19,7 @@ class Block:
         for t in transactions:
             if not t.is_valid():
                 continue
-            if len(self.transactions) >= MAX_TRANSACTIONS:
+            if len(self.transactions) >= self.MAX_TRANSACTIONS:
                 break
             self.transactions.append(i)
         # update transactions hash
