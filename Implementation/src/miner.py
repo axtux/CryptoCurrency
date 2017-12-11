@@ -12,11 +12,13 @@ class Miner:
 
     FLAG=10 #number of iteration of mining before check if the block has been found
 
+
     def __init__(self, blockchain, address, relay):
         self.blockchain = blockchain
         self.address = address
         self.relay = relay
         self.flag=0
+        self.index=0
 
     def create_block(self):
         self.block= Block(self.blockchain.get_last_hash(),self.address,self.get_ordered_transactions())
@@ -51,16 +53,12 @@ class Miner:
         return False
 
     def mine(self,strategy):
-        digest = self.block.set_proof(strategy(self.block.proof))
+        digest = self.block.set_proof(strategy(self.index))
+        self.index = self.index +1 
 
-    def increasepow(self,previousPow=0):
-        return previousPow+1
-
-    def decreasepow(self, previousPow=2**256):
-        return previousPow-1
-
+"""
     def randompow(self,previousPow=0):
-        return random.randint(0,2**256)
+        return random.randint(0,2**256)"""
 
 
 def randompow(previousPow=0):
