@@ -30,7 +30,8 @@ To execute the master nodes you have to execute the following command : master.p
 # How to execute the Miner 
 
 To execute the Miner node you have to execute the following command : miner.py addr
-The addr parameter is the address where the rewards are sent. 
+
+The addr parameter is the address where the rewards are sent. The type of this parameter is a string. 
 
 # How to launch the program
 

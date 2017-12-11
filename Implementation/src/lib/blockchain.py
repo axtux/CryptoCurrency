@@ -84,7 +84,7 @@ class Blockchain(object):
         for address, amount in receivers:
             tmp = self.db.get_address(address)
             if tmp == None: # do not exists
-                self.add_address_amount(address, amount, False)
+                self.db.set_address_amount(address, amount)
             else:
                 new_amount = int(tmp[1]) + amount
                 self.db.set_address_amount(address, new_amount)
@@ -257,7 +257,7 @@ if __name__ == '__main__':
     sender = Address()
     receiver1 = Address()
     receiver2 = Address()
-    transactions = [Transaction(sender.public(), [str(receiver1), str(receiver2)], [123, 321])]
+    transactions = [Transaction(sender.public(), ([str(receiver1), str(receiver2)], [123, 321]))]
     #iv = iv()
     miner_address = Address()
     block = Block(previousHash, str(miner_address), transactions)
@@ -342,9 +342,10 @@ if __name__ == '__main__':
 
     print("\n\n\n\n\n")
     previousHash = blockchain.get_last_hash()
-    transaction_1 = Transaction(322, "A", "B")
-    transaction_2 = Transaction(234324, "Z", "T")
-    transactions = [transaction_1, transaction_2]
+    sender2 = Address()
+    receiver21 = Address()
+    receiver22 = Address()
+    transactions = [Transaction(sender.public(), ([str(receiver1), str(receiver2)], [10, 300]))]
     block2 = Block(previousHash, transactions)
 
     blockchain.add_block(block2)
