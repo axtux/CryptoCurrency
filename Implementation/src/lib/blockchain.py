@@ -183,7 +183,8 @@ class BlockchainDatabase(object):
         cursor = self.conn.cursor()
         sql = "SELECT address, amount, spent FROM addresses WHERE address=? ;"
         cursor.execute(sql, (address, ))
-        return self.cursor.fetchone()
+        res = cursor.fetchone()
+        return res
 
     def set_last_hash(self, last_hash):
         cursor = self.conn.cursor()
