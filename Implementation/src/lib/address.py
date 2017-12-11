@@ -6,6 +6,7 @@ import sqlite3
 
 # local imports
 from lib.utils import generateDSAKey, buildDSAKey, intToBytes, encrypt_AES, iv, decrypt_AES, ripemd_160
+from lib.walletDB import loadKey, recordAddress
 
 class Address(object):
     """The private and public key for the Wallet
@@ -19,40 +20,11 @@ class Address(object):
             self.privateKey.x = encrypt_AES(AES_Key, intToBytes(self.privateKey.x), self.iv)
             self.publicKey = self.privateKey.publickey()
             self.address = self.generateAddress()
-            self.recordAddress()
+            recordAddress(self.address, self.publicKey.y, self.publicKey.g, self.publicKey.p, self.publicKey.q, self.privateKey.x)
         else:   #Load an existing address
             self.address = addr
-            key, key_pr = self.loadKey()
-            self.privateKey = buildDSAKey(key, key_pr)
+            self.privateKey, self.iv = loadKey(self.address)
             self.publicKey = self.privateKey.publickey()
-
-
-    def signature(self, m):
-        k = random.randint(2, self.publicKey.q - 1)
-        return self.privateKey.sign()
-
-    def loadKey(self):
-        """Load the public / private key from the DB
-           The private key is still encrypt with AES in the DB
-        """
-        conn = sqlite3.connect('../databases/client.db')
-        cursor = conn.cursor()
-        cursor.execute("""SELECT pkey_y, pkey_g, pkey_p, pkey_q, prkey_x FROM addresses WHERE address=?""", (self.address,))
-        keys = cursor.fetchone()
-        key = (int(keys[0]),int(keys[1]),int(keys[2]),int(keys[3]))
-        conn.close()
-        return key, keys[4]
-
-    def recordAddress(self):
-        """Write the actual key and address on the DB
-           Change the previous "actual address" to an "old address"
-        """
-        conn = sqlite3.connect('../databases/client.db')
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO addresses(address,pkey_y,pkey_g,pkey_p,pkey_q,prkey_x) VALUES(?,?,?,?,?,?)""",\
-                        (self.address, str(self.privateKey.y), str(self.privateKey.g), str(self.privateKey.p), str(self.privateKey.q), self.privateKey.x))
-        conn.commit()
-        conn.close()
 
     def generateAddress(self):
         """Create a hash with the Public Key to make an adress

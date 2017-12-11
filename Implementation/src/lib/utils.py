@@ -49,9 +49,8 @@ def bytesToInt(b):
 def generateDSAKey():
     return DSA.generate(1024)      #3072 is recomend by the NIST 800-57
 
-def buildDSAKey(key_tuple, key_pr):
-    key = DSA.construct(key_tuple)
-    key.x = key_pr
+def buildDSAKey(y, g, p, q, x):
+    key = DSA.construct((x, g, p, q, x))
     return key
 
 def encrypt_AES(key, m, iv):
