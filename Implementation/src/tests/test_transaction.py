@@ -18,16 +18,12 @@ class Test(unittest.TestCase):
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
     
-    def test_json_1(self):
+    def test_json(self):
         a = Address()
         bc = TestBlockchain()
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
-        print(t.toJson(True))
-        print(t.toJson(False))
-        t.sign(a)
-        print(t.toJson(True))
-        print(t.toJson(False))
+        t.toJson()
     
     def test_total_amount(self):
         a = Address()
@@ -50,6 +46,15 @@ class Test(unittest.TestCase):
         t = Transaction(a.public(), rs)
         t.sign(a)
         self.assertTrue(t.is_signed())
+    
+    def test_changed(self):
+        a = Address()
+        bc = TestBlockchain()
+        rs = [('lui', 2), ('elle', 3)]
+        t = Transaction(a.public(), rs)
+        t.sign(a)
+        t.receivers = [('lui', 3), ('elle', 3)]
+        self.assertFalse(t.is_signed())
     
     def test_not_valid(self):
         a = Address()

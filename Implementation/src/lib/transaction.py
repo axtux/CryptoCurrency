@@ -1,13 +1,14 @@
 import json
 import random
-from lib.utils import sha_256, ripemd_160
+from lib.utils import sha_256_bytes, ripemd_160
 
 class Transaction(object):
     def __init__(self, sender_public_key, receivers):
         """sender_public_key: Address object
         receivers: array of tuples (str_address, value)
         """
-        self.sender_public_key = sender_public_key
+        # avoid transporting private key with transaction
+        self.sender_public_key = sender_public_key.public()
         self.receivers = receivers
         self.signature = None
     
@@ -18,7 +19,7 @@ class Transaction(object):
         if private_key.public() != self.sender_public_key:
             return False
         k = random.randint(2, private_key.dsa.q - 1)
-        m = sha_256(self.toJson(False))
+        m = sha_256_bytes(self.toJson(False))
         self.signature = private_key.dsa.sign(m,k)
 
     def is_signed(self):
@@ -26,7 +27,7 @@ class Transaction(object):
         """
         if self.signature is None:
             return False
-        m = sha_256(self.toJson(False))
+        m = sha_256_bytes(self.toJson(False))
         return self.sender_public_key.dsa.verify(m, self.signature)
 
     def get_total_amount(self):
