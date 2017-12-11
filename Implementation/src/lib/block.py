@@ -21,7 +21,7 @@ class Block:
                 continue
             if len(self.transactions) >= self.MAX_TRANSACTIONS:
                 break
-            self.transactions.append(i)
+            self.transactions.append(t)
         # update transactions hash
         h = hashlib.sha256()
         for i in self.transactions:
