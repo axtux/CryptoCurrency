@@ -1,9 +1,9 @@
 import sqlite3 
 
 # local imports
-from lib.utils import sha_256
-from lib.block import Block
-from lib.transaction import Transaction
+from utils import sha_256
+from block import Block
+from transaction import Transaction
 
 class Blockchain(object):
     """handle blocks storage and addresses amount database
@@ -12,7 +12,7 @@ class Blockchain(object):
     FIRST_HASH = sha_256("42")
 
     def __init__(self):
-        self.db = BlockchainDatabase('blockchain')
+        self.db = BlockchainDatabase("blockchain")
         self.last_hash = self.get_last_hash()
         if self.last_hash == None:
             self.last_hash = FIRST_HASH
@@ -32,7 +32,12 @@ class Blockchain(object):
         return self._last_block
 
     def get_last_hash(self):
-        return self.last_hash
+        hash_ = self.FIRST_HASH
+        block = self.get_next_block(hash_)
+        while block != None:
+            hash_ = sha_256(block)
+            block = self.get_next_block(hash_)
+        return hash_
 
     def get_amount_of_address(self, address):
         r = self.db.get_address(address)
@@ -40,12 +45,10 @@ class Blockchain(object):
         return int(r[1])
 
     def add_block(self, block):
-        Blockchain.count += 1
         # On update le dernier block et le hash du dernier bloc
-        self._last_block = block
-        self.last_hash = sha_256(str(self._last_block))
+        self.last_hash = sha_256(str(block))
         # on rajoute le bloc dans la DB contenant tout les blocs
-        self.db.add_block(block.previousHash, block)
+        self.db.add_block(blockchain.last_hash, block)
         for i in range(len(block.transactions)):
             # Pour chaque transaction, on la rajoute dans la DB des transactions
             self.write_in_transactions_DB(block.previousHash, i, block.transactions[i].amount, block.transactions[i].sender, block.transactions[i].receiver);
@@ -70,13 +73,12 @@ class Blockchain(object):
 
     def get_next_block(self, previous_hash):
         json = self.db.get_block(previous_hash)
-        # TODO: handle if not exists
         block = Block.fromJson(json)
         return block
 
 class BlockchainDatabase(object):
     def __init__(self, name):
-        self.conn = sqlite3.connect('databases/'+name+'.db')
+        self.conn = sqlite3.connect("databases."+name+".db")
         
         # blocks
         self.conn.execute("""
@@ -95,8 +97,7 @@ class BlockchainDatabase(object):
     
     def add_block(self, previous_hash, block):
         cursor = self.conn.cursor()
-        sql = "INSERT INTO blocks (previous_hash, json_block) VALUES (?, ?) ;"
-        cursor.execute(sql, (previous_hash, block.toJson()))
+        cursor.execute("INSERT INTO blocks (previous_hash, json_block) VALUES (?, ?)", (previous_hash, block.toJson()));
         self.conn.commit()
     
     def add_address(self, address, amount=0, spent=0):
@@ -107,9 +108,8 @@ class BlockchainDatabase(object):
 
     def get_block(self, previous_hash):
         cursor = self.conn.cursor()
-        sql = "SELECT previous_hash, json_block FROM blocks WHERE previous_hash=? ;"
-        cursor.execute(sql, (previous_hash))
-        json = self.cursor.fetchone()
+        cursor.execute("SELECT previous_hash, json_block FROM blocks WHERE previous_hash=?", (previous_hash, ))
+        json = cursor.fetchone()
         return Block.fromJson(json)
 
     def get_address(self, address):
@@ -162,15 +162,19 @@ def print_addresses(db):
     blockchain.conn.commit()
 
 if __name__ == '__main__':
-    db = BlockchainDatabase('blockchain')
+    db = BlockchainDatabase("blocks")
+    print_blocks(db)
     print("NEW TEST:\n")
     blockchain = Blockchain()
+    print("passed1")
     previousHash = blockchain.get_last_hash()
     transaction_1 = Transaction(123, "A", "B")
     transaction_2 = Transaction(234324, "Z", "T")
     transactions = [transaction_1, transaction_2]
     block = Block(previousHash, transactions)
+    print("passed2")
     blockchain.add_block(block)
+    print("passed2")
     print("printing blockchain\n" + str(blockchain))
     print("printing address list")
     print_addresses(db)
