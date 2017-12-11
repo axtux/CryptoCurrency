@@ -117,17 +117,17 @@ class BlockchainDatabase(object):
             spent BOOLEAN DEFAULT NULL
         );""")
     
-    def fetch_one(sql, params=None):
+    def fetch_one(self, sql, params=None):
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
         return cursor.fetchone()
     
-    def fetch_all(sql, params=None):
+    def fetch_all(self, sql, params=None):
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
         return cursor.fetchall()
     
-    def commit(sql, params=None):
+    def commit(self, sql, params=None):
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
         elf.conn.commit()
@@ -198,6 +198,8 @@ def print_blocks(db):
             print(transaction[3])
             print(transaction[4])
             print("\n")
+    print("finished printingDB")
+
 
 def print_addresses(db):
     cursor = db.conn.cursor()
@@ -214,8 +216,12 @@ def print_addresses(db):
 if __name__ == '__main__':
     print("NEW TEST:\n")
     blockchain = Blockchain()
+    db = blockchain.db
+    previousHash = blockchain.get_last_hash()
+
+
     print("destroying de DB")
-    cursor = blockchain.db.conn.cursor()
+    cursor = db.conn.cursor()
     cursor.execute("""
         DROP TABLE blocks
     """)
@@ -225,17 +231,15 @@ if __name__ == '__main__':
     cursor.execute("""
         DROP TABLE last_hash
     """)
-    blockchain.db.conn.commit()
+    db.conn.commit()
     print("destroyed")
 
+    print("TESTING Blocks DB")
 
-
-    blockchain = Blockchain() 
-    print(" blockchain is indeed empty: " + str(blockchain))
-    print("passed1")
+    blockchain = Blockchain()
+    db = blockchain.db
     previousHash = blockchain.get_last_hash()
-    print("previousHash: " + str(previousHash))
-    print("passed2")
+
     password = "veryGoodPassword"
     key = sha_256(password)[:32].encode('utf-8')
     mess = "bonjour"
@@ -259,9 +263,20 @@ if __name__ == '__main__':
     miner_address = Address(AES_Key=key_miner)
     block = Block(previousHash, miner_address.address, transactions)
     block.set_proof("43334")
-    db = BlockchainDatabase("blocks")
-    print("DB blocks without block")
-    print_blocks(db)
+    json_block = block.toJson()
+
+    db.add_json_block(previousHash, json_block)
+    print("DB with block added")
+    print(db)
+
+    db.fetch_one()
+    db.fetch_all()
+    db.commit()
+    db.get_json_block(previousHash)
+
+    print("TESTING ADDRESS DB")
+
+
 
 
     print("passed2")
