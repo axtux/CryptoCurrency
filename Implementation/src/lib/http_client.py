@@ -16,7 +16,11 @@ class MasterClient(object):
     def get_block(self, previous_hash):
         """send GET request to self.url/blocks/previous_hash
         """
-        r = requests.get(self.url+'blocks/'+previous_hash)
+        try:
+            r = requests.get(self.url+'blocks/'+previous_hash)
+        except ConnectionRefusedError:
+            print('http error')
+            return None
         if not r.status.code == 200:
             return None
         return Block.fromJson(r.text())
@@ -25,7 +29,11 @@ class MasterClient(object):
         """send POST request with JSON encoded block to self.url/blocks/
         """
         data = block.toJson()
-        r = requests.post(base_url+'blocks/', data=data)
+        try:
+            r = requests.post(base_url+'blocks/', data=data)
+        except ConnectionRefusedError:
+            print('http error')
+            return False
         if r.status_code == 200:
             return True
         return False
@@ -45,8 +53,12 @@ class RelayClient(MasterClient):
     def get_transactions(self):
         """send GET request to relay/transactions/ and parse it
         """
-        r = requests.get(self.url+'transactions/')
-        if not r.status.code == 200:
+        try:
+            r = requests.get(self.url+'transactions/')
+        except ConnectionRefusedError:
+            print('http error')
+            return None
+        if not r.status_code == 200:
             return None
         try:
             json_ts = r.json()
@@ -63,7 +75,11 @@ class RelayClient(MasterClient):
         """send POST request with JSON encoded transaction to relay/transactions/
         """
         data = transaction.toJson()
-        r = requests.post(base_url+'transactions/', data=data)
+        try:
+            r = requests.post(base_url+'transactions/', data=data)
+        except ConnectionRefusedError:
+            print('http error')
+            return False
         if r.status_code == 200:
             return True
         return False
