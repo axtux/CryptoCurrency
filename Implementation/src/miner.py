@@ -61,14 +61,12 @@ class Miner:
 
 if __name__ == '__main__':
     argc = len(sys.argv)
-    if not argc == 3:
-        exit('usage: python3 '+sys.argv[0]+' YOUR_ADDRESS + RELAY_NUMBER' )
+    if not argc == 2:
+        exit('usage: python3 '+sys.argv[0]+' YOUR_ADDRESS' )
     relays = Network.get_relays()
     n = len(relays)
-    i = int(sys.argv[2]) % n
-    print('Starting miner with address '+str(sys.argv[1])+' and with relay number'+str(sys.argv[2]))
+    i=random.randint(0,n)
+    print('Starting miner with address '+str(sys.argv[1]))
     b = Blockchain()
     miner=Miner(b,sys.argv[1],relays[i])
     miner.run()
-
-    # TODO update blockchain in background or receive pushes from server
