@@ -58,7 +58,7 @@ class Block:
     def fromJson(data):
         try:
             data = json.loads(data)
-        except ValueError:
+        except TypeError:
             return None
         b = Block(data["previous_hash"], data["miner_address"])
         ts = []
