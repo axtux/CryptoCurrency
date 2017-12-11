@@ -13,7 +13,7 @@ class Block:
         self.miner_address = miner_address
         self.set_transactions(transactions)
 
-    def set_transactions(transactions):
+    def set_transactions(self, transactions):
         # add valid transactions
         self.transactions = []
         for t in transactions:
@@ -58,7 +58,7 @@ class Block:
     def fromJson(data):
         try:
             data = json.loads(data)
-        except ValueError:
+        except TypeError:
             return None
         b = Block(data["previous_hash"], data["miner_address"])
         ts = []

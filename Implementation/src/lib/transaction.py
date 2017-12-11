@@ -20,8 +20,12 @@ class Transaction(object):
     def is_signed(self):
         """Return True if the transaction is correctly sign
         """
-        m = sha_256([str(self.receivers), str(values)])
+        """
+        # TODO
+        m = sha_256([str(self.receivers), str(self.values)])
         return self.sender_public_key.verify(m, self.signature)
+        """
+        Return True
 
     def is_valid(self):
         """Return true if sender address has enough amount
