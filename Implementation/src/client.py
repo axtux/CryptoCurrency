@@ -39,17 +39,6 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 if __name__ == '__main__':
-    """
-    conn = Connection()
-    w = conn.allowConnection("prout","pass")
-    print(str(w.addr))
-    print(w.count)
-    dest = [("11", 15), ("12", 55)]
-    t = w.createTransaction("pass", dest)
-    print(str(w.addr))
-    print(t.is_signed())
-    """
-
     conn = Connection()
     clear()
     print("Hello")
