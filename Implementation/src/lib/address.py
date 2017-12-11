@@ -20,7 +20,7 @@ class Address(object):
             self.privateKey.x = encrypt_AES(AES_Key, intToBytes(self.privateKey.x), self.iv)
             self.publicKey = self.privateKey.publickey()
             self.address = self.generateAddress()
-            recordAddress(self.address, self.publicKey.y, self.publicKey.g, self.publicKey.p, self.publicKey.q, self.privateKey.x)
+            recordAddress(self.address, self.publicKey.y, self.publicKey.g, self.publicKey.p, self.publicKey.q, self.privateKey.x, self.iv)
         else:   #Load an existing address
             self.address = addr
             self.privateKey, self.iv = loadKey(self.address)

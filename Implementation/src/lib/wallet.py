@@ -21,10 +21,10 @@ class Wallet(object):
         AES_key : The AES key of the user using to encrypt / decrypt his private key
         addr    : The current adress of the user
         """
-        self.blockChain = Blockchain()
-        self.relay = RelayClient()
-        self.updater = Updater(self.blockChain, self.relay)
-        self.updater.update()
+        #self.blockChain = Blockchain()
+        #self.relay = RelayClient()
+        #self.updater = Updater(self.blockChain, self.relay)
+        #self.updater.update()
         self.user_ID = user_ID
         self.addrList = loadAddressList(self.user_ID)   # list of String address
         self.last = len(self.addrList)-1    #index of the actual address
@@ -33,7 +33,8 @@ class Wallet(object):
             self.addrList.append(self.addr.address)
         else:
             self.addr = Address(addr=self.addrList[self.last])
-        self.count = self.blockChain.get_amount_of_address(self.addr)
+        #self.count = self.blockChain.get_amount_of_address(self.addr)
+        self.count = 55555
 
     def checkUpdate(self):
         """Update the amount and the blockChain
@@ -56,7 +57,7 @@ class Wallet(object):
             block = self.blockChain.get_next_block(block.get_hash())
         return count
 
-    def createTransaction(self, password, moneyList, destList, AES_Key):
+    def createTransaction(self, password, moneyList, destList):
         """Create a new transaction and send it to the RelayNode
            moneyList[i] is the value send to the address destList[i]
            The last transaction is the rest of the wallet send to the new user address
@@ -69,10 +70,14 @@ class Wallet(object):
             moneyList.append(self.count - sum(moneyList))
             destList.append(newAddr.address)
             transac = transaction(self.addr.publicKey, destList, moneyList)
+            transac.sign(self.addr.privateKey)
             self.relay.submit_transaction(transac)
             self.addrList.append(newAddr.address)
             self.addr = newAddr
             add_address(self.user_ID, self.addr, len(self.addrList)-1)
+            return True
+        else:
+            return False
 
 if __name__ == '__main__':
     """

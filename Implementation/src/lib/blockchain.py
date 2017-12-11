@@ -28,7 +28,7 @@ class Blockchain(object):
 
     def __init__(self):
         self.db = BlockchainDatabase("blockchain")
-        print('initated BDD, last hash: '+self.get_last_hash())
+        #print('initated BDD, last hash: '+self.get_last_hash())
 
     def __repr__(self):
         temp = "\n"
@@ -66,12 +66,10 @@ class Blockchain(object):
     def add_block(self, block):
         # TODO: english comments
         # On update le dernier block et le hash du dernier bloc
-        self.last_hash = sha_256(str(block))
         # on rajoute le bloc dans la DB contenant tout les blocs
-        self.db.add_json_block(blockchain.last_hash, block.toJson())
+        self.db.set_last_hash(sha_256(str(block)))
+        self.db.add_json_block(blockchain.db.get_last_hash(), block.toJson())
         for i in range(len(block.transactions)):
-            # Pour chaque transaction, on la rajoute dans la DB des transactions
-            self.write_in_transactions_DB(block.previousHash, i, block.transactions[i].amount, block.transactions[i].sender, block.transactions[i].receiver);
             temp = self.get_address(block.transactions[i].receiver)
             if temp == None:
                 # On cherche si l'addresse a deja ete utilise pour recevoir. Si non on la rajoute
@@ -106,7 +104,8 @@ class BlockchainDatabase(object):
         # last_hash
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS last_hash (
-            hash TEXT PRIMARY KEY NOT NULL
+            void INTEGER PRIMARY KEY NOT NULL,
+            hash TEXT 
         );""")
 
         # addresses with amount and spent flag
@@ -158,36 +157,37 @@ class BlockchainDatabase(object):
         cursor = self.conn.cursor()
         cursor.execute("SELECT hash FROM last_hash")
         res = cursor.fetchone()
-        return res
+        if res == None:
+            return res
+        else:
+            return res[0]
 
     def get_address(self, address):
         cursor = self.conn.cursor()
         sql = "SELECT address, amount, spent FROM addresses WHERE address=? ;"
-        self.cursor.execute(sql, (address))
+        cursor.execute(sql, (address))
         return self.cursor.fetchone()
 
     def set_last_hash(self, last_hash):
-        print("zec")
-        print(last_hash)
         cursor = self.conn.cursor()
         if self.get_last_hash() == None:
-            sql = "INSERT INTO last_hash  (hash) VALUES (?)"
-            cursor.execute(sql, (last_hash,))
+            sql = "INSERT INTO last_hash  (void, hash) VALUES (?, ?)"
+            cursor.execute(sql, (0, last_hash))
         else:
-            sql = "UPDATE last_hash SET hash;"
+            sql = "UPDATE last_hash SET hash = ? WHERE void = 0"
             cursor.execute(sql, (last_hash,))
         self.conn.commit()
 
     def set_address_amount(self, address, amount):
         cursor = self.conn.cursor()
         sql = "UPDATE addresses SET amount=? WHERE address=? ;"
-        self.cursor.execute(sql, (amount, address))
+        cursor.execute(sql, (amount, address))
         self.conn.commit()
 
     def set_address_spent(self, address, spent=1):
         cursor = self.conn.cursor()
         sql = "UPDATE addresses SET spent=? WHERE address=? ;"
-        self.cursor.execute(sql, (spent, address))
+        cursor.execute(sql, (spent, address))
         self.conn.commit()
 
 def print_blocks(db):
@@ -223,14 +223,10 @@ def print_addresses(db):
     db.conn.commit()
 
 if __name__ == '__main__':
-    print("NEW TEST:\n")
-    blockchain = Blockchain()
-    db = blockchain.db
-    previousHash = blockchain.get_last_hash()
 
-
-    print("destroying de DB")
-    cursor = db.conn.cursor()
+    conn = sqlite3.connect("databases.blockchain.db")
+    cursor = conn.cursor()
+    print("deleting DB")
     cursor.execute("""
         DROP TABLE blocks
     """)
@@ -240,8 +236,15 @@ if __name__ == '__main__':
     cursor.execute("""
         DROP TABLE last_hash
     """)
-    db.conn.commit()
+    conn.commit()
     print("destroyed")
+    
+
+    print("NEW TEST:\n")
+    blockchain = Blockchain()
+    db = blockchain.db
+    previousHash = blockchain.get_last_hash()
+
 
     print("TESTING Blocks DB")
 
@@ -296,14 +299,35 @@ if __name__ == '__main__':
     db.add_address(receiver2.address, 321,0)
     print("printing address DB after havin added")
     print_addresses(db)
+    db.set_address_amount(sender.address, 100)
+    print("printing address DB after modification")
+    print_addresses(db)
+    db.set_address_spent(sender.address, 0)
+    print("printing address DB after modification")
+    print_addresses(db)
+
+
+
 
     print("TESTING LAST_HASH DB")
     db.set_last_hash(sha_256("42"))
     print(db.get_last_hash())
+    db.set_last_hash(sha_256("4"))
+    print(db.get_last_hash())
 
 
-    print("destroying de DB")
-    cursor = blockchain.db.conn.cursor()
+    """
+    db.set_last_hash(sha_256("2"))
+    print(db.get_last_hash())
+    """
+
+
+
+    print("\n\n\n\n\n")
+
+    conn = sqlite3.connect("databases.blockchain.db")
+    cursor = conn.cursor()
+    print("deleting DB")
     cursor.execute("""
         DROP TABLE blocks
     """)
@@ -313,12 +337,10 @@ if __name__ == '__main__':
     cursor.execute("""
         DROP TABLE last_hash
     """)
-    blockchain.db.conn.commit()
+    conn.commit()
     print("destroyed")
-    print_addresses(db)
-    print_blocks(db)
 
-
+    blockchain = Blockchain()
 
     print("passed2")
     blockchain.add_block(block)

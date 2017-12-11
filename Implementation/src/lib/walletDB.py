@@ -47,14 +47,14 @@ def loadKey(addr):
     conn.close()
     return key, keys[5]
 
-def recordAddress(addr, y, g, p, q, x):
+def recordAddress(addr, y, g, p, q, x, iv):
     """Write the actual key and address on the DB
        x is Encrypt with AES
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("""INSERT INTO addresses(address,pkey_y,pkey_g,pkey_p,pkey_q,prkey_x) VALUES(?,?,?,?,?,?)""",\
-                    (addr, str(y), str(g), str(p), str(q), x))
+    cursor.execute("""INSERT INTO addresses(address,pkey_y,pkey_g,pkey_p,pkey_q,prkey_x,iv) VALUES(?,?,?,?,?,?,?)""",\
+                    (addr, str(y), str(g), str(p), str(q), x, iv))
     conn.commit()
     conn.close()
 
