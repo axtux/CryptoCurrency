@@ -39,7 +39,7 @@ class Block:
         """Check that hash starts with some zeroes
         and that addresses are valid
         """
-        for t in transacitons:
+        for t in self.transactions:
             if not t.is_valid(blockchain):
                 return False
         return self.hash[:Block.DIFFICULTY] == '0'* Block.DIFFICULTY

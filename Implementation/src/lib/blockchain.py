@@ -68,43 +68,25 @@ class Blockchain(object):
         # check transactions validity
         if not block.is_valid(self):
             return False
-        
+
         # add block
         self.db.set_last_hash(block.hash())
         self.db.add_json_block(blockchain.db.get_last_hash(), block.toJson())
-        
+
         # transactions are already checked within block
         for t in block.transactions:
             sender = t.senderAddress()
             self.db.set_address_spent(sender, True)
             self.update_addresses_amount(t.receivers)
-    
+
     def update_addresses_amount(self, receivers):
         for address, amount in receivers:
             tmp = self.db.get_address(address)
             if tmp == None: # do not exists
                 self.add_address_amount(address, amount, False)
             else:
-<<<<<<< HEAD
-            # Si oui, on update la valeur et on met le bon flag
-                temp_amount = int(temp[1]) - block.transactions[i].amount
-                self.db.set_address_amount(block.transactions[i].sender, temp_amount)
-                self.db.set_address_spent(block.transactions[i].sender, True)
-            for j in range(len(block.transactions[i])):
-                temp = self.db.get_address(block.transactions[i].receivers)
-                if temp == None:
-                    # On cherche si l'addresse a deja ete utilise pour recevoir. Si non on la rajoute
-                    self.write_in_address_DB(block.transactions[i].receiver, block.transactions[i].amount, False);
-                else:
-                # Si oui on update son argent
-                    temp_amount = int(temp[1]) + block.transactions[i].amount
-                    self.db.set_address_amount(block.transactions[i].receiver, temp_amount)
-
-            self.db.set_last_hash(block.hash())
-=======
                 new_amount = int(tmp[1]) + amount
                 self.db.set_address_amount(address, new_amount)
->>>>>>> 232c18d9a0f901d32f4f7314e2e73f6905d053ba
 
 
 class BlockchainDatabase(object):
@@ -182,7 +164,7 @@ class BlockchainDatabase(object):
     def get_address(self, address):
         cursor = self.conn.cursor()
         sql = "SELECT address, amount, spent FROM addresses WHERE address=? ;"
-        cursor.execute(sql, (address, ))
+        cursor.execute(sql, (address))
         return self.cursor.fetchone()
 
     def set_last_hash(self, last_hash):

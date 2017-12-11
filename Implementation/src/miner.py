@@ -40,7 +40,7 @@ class Miner:
             else:
                 self.flag = self.flag - 1
                 self.mine(strategy)
-                if(self.block.is_valid()):
+                if(self.block.is_valid(self.blockchain)):
                     self.relay.submit_block(self.block)
                     self.flag = 0 #Need to take new transactions
 
