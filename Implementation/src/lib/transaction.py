@@ -18,7 +18,7 @@ class Transaction(object):
     def is_signed(self):
         """Return True if the transaction is correctly sign
         """
-        return self.sender_public_key.verify(str(sum(self.values)))
+        return self.sender_public_key.verify(str(sum(self.values)), self.signature)
 
     def is_valid(self):
         """Return true if sender address has enough amount
