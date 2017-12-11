@@ -13,7 +13,7 @@ class Block:
         self.set_transactions(transactions)
 
     def set_transactions(transactions):
-        # TODO: add transactions and update trasanctions_hash
+        # add valid transactions
         self.transactions = []
         for t in transactions:
             if not t.is_valid():
