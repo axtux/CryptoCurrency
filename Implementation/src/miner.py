@@ -1,22 +1,20 @@
-import itertools  # List permutation methods
-import utils
-import block
-import wallet  # Crypto methods
-import Network.Miner
+import lib.utils
+import lib.block
 import random
-import blockChain
+import lib.blockchain
+import lib.updater
 class Miner:
 
-     FLAG=10 #number of iteration of mining before check if the block has been found
+    FLAG=10 #number of iteration of mining before check if the block has been found
 
     def __init__(self, blockchain, address, relay):
-        self.blockChain = blockChain
-        self.adress = address
+        self.blockchain = blockchain
+        self.address = address
         self.relay = relay
         self.flag=0
 
     def create_block(self):
-        self.block= Block(self.blockChain.get_last_block().hash(),self.adress,self.get_ordered_transactions())
+        self.block= Block(self.blockchain.get_last_block().hash(),self.address,self.get_ordered_transactions())
 
 
     def get_ordered_transactions(self):
@@ -30,9 +28,7 @@ class Miner:
         while(1):
             if(self.flag == 0): #Check if a new block has been found
                 self.flag = FLAG
-                new_blockchain = self.relay.getBlockchain()
-                if not (new_blockchain.get_last_block().hash()==self.blockChain.get_last_block().hash()): # New block has been found
-                    self.blockchain = self.relay.getBlockchain()
+                if self.update_blockchain(): # New block has been found
                     self.create_block()
             else:
                 self.flag = self.flag - 1
@@ -42,10 +38,15 @@ class Miner:
                     self.flag = 0 #Need to take new transactions
 
 
-
+    def update_blockchain(self):
+        updater=Updater(self.blockchain)
+        if updater.update() : #True if there is an update
+            self.blockchain = updater.blockchain
+            return True
+        return False
 
     def mine(self,strategy):
-        digest = self.block.hash(strategy(self.bloc.pow))
+        digest = self.block.set_proof(strategy(self.bloc.pow))
 
     def increasepow(self,previousPow=0):
         return previousPow+1
