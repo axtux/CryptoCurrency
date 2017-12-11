@@ -22,6 +22,15 @@ The relay nodes handle two types of requests :
 The master node also handle GET and POST requests :
   - GET : get the last block of the blockchain.
   - POST : submit the new mined blocked to the relay nodes.
+  
+To execute the relay nodes you have to execute the following command : relay.py 0
+
+To execute the master nodes you have to execute the following command : master.py
+
+# How to execute the Miner 
+
+To execute the Miner node you have to execute the following command : miner.py addr
+The addr parameter is the address where the rewards are sent. 
 
 # How to launch the program
 
