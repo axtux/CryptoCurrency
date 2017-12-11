@@ -139,7 +139,7 @@ class BlockchainDatabase(object):
     def get_last_hash(self, last_hash):
         cursor = self.conn.cursor()
         cursor.execute("SELECT hash FROM last_hash", (last_hash,))
-        return = cursor.fetchone()
+        return cursor.fetchone()
 
     def get_address(self, address):
         cursor = self.conn.cursor()

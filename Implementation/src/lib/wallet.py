@@ -14,7 +14,7 @@ class Wallet(object):
     Wallet have money and can create some Transaction to send money to an another Wallet
     """
 
-    def __init__(self, user_ID, AES_Key=None, addr=None):
+    def __init__(self, user_ID, AES_Key=None):
         """Create a new wallet
 
         user_ID : The ID of the user to select it's own address on the DB
@@ -26,12 +26,11 @@ class Wallet(object):
         self.updater = Updater(self.blockChain, self.relay)
         self.updater.update()
         self.user_ID = user_ID
-        self.addrList = loadAddressList(self.user_ID)
+        self.addrList = loadAddressList(self.user_ID)   # list of String address
         self.last = len(self.addrList)-1    #index of the actual address
         if self.addrList == []:    #New Wallet : Create the first Address
             self.addr = Address(AES_Key=AES_Key)
             self.addrList.append(self.addr.address)
-            self.defineActualAddress(self.addr)
         else:
             self.addr = Address(addr=self.addrList[self.last])
         self.count = self.blockChain.get_amount_of_address(self.addr)
