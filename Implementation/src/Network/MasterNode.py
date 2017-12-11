@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json 
+import json
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -17,7 +17,7 @@ IP_RELAY = [
 
 """
     MAN
-        for wallet 
+        for wallet
             to implement:  (see pre/post cond.)
                 getBlockChain()
                 submitBlock(block)
@@ -41,7 +41,7 @@ def submitBlock(block):
     #TODO add to block chain
     return True
 
- 
+
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
@@ -55,34 +55,34 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         # Send response status code
         self.send_response(200)
- 
+
         # Send headers
         self.send_header('Content-type','text/html')
         self.end_headers()
- 
+
         # Send message back to client
         message = str(self.handleGet())
         # Write content as utf-8 data
         self.wfile.write(bytes(message, "utf8"))
-        return 
-        
+        return
+
   # POST
     def do_POST(self):
         data = (self.rfile.read(int(self.headers['Content-Length'])).decode("utf-8") )
-      
+
         # Send response status code
         self.send_response(200)
- 
+
         # Send headers
         self.send_header('Content-type','text/html')
         self.end_headers()
- 
+
         # Send message back to client
         message = str(self.handlePost(data))
         # Write content as utf-8 data
         self.wfile.write(bytes(message, "utf8"))
         return
- 
+
 def run():
     print('starting server...')
 
@@ -92,13 +92,13 @@ def run():
     httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
     print('running server...')
     httpd.serve_forever()
- 
+
 if __name__ == '__main__':
     run()
 
 
 """
-	
+
 	protocol spec
 	from relay to master (master is the server)
 		Obtain a copy of the blockchain
@@ -108,16 +108,16 @@ if __name__ == '__main__':
 								{
 									ID: block id,
 									DATA: block data,
-									Hash: hash of the block		
+									Hash: hash of the block
 								},
-								...				
+								...
 							]
 		submit a block
 			POST /blockchain with this JSON
 				Rquest data, a json with
 					{
 						HASH: hash,
-						DATA: block data						
+						DATA: block data
 					}
 				response
 					if success 200 with this JSON
