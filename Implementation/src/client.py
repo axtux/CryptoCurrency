@@ -66,7 +66,7 @@ if __name__ == '__main__':
     clear()
     password = input("Please, enter your password\n")
     clear()
-    isNew = isNew == 'y'    #True if 'y', False if 'n'
+    isNew = (isNew == 'y')    #True if 'y', False if 'n'
     wallet = conn.allowConnection(user_ID, password, isNew)
     while wallet == None:
         print("You make a mistake, please retry")
@@ -79,7 +79,6 @@ if __name__ == '__main__':
         clear()
         password = input("Please, enter your password again\n")
         clear()
-        isNew = (isNew == 'y')    #True if 'y', False if 'n'
         wallet = conn.allowConnection(user_ID, password, isNew)
 
     command = 'show'
