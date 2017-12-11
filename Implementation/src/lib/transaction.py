@@ -21,7 +21,7 @@ class Transaction(object):
         """Return True if the transaction is correctly sign
         """
         """
-        TODO
+        # TODO
         m = sha_256([str(self.receivers), str(self.values)])
         return self.sender_public_key.verify(m, self.signature)
         """
