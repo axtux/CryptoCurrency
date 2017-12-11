@@ -26,7 +26,7 @@ def createDB():
     conn.close()
 
 
-def loadAddressList(user_ID, password):
+def loadAddressList(user_ID):
     """Load a list with all address from the user
     """
     addrList = []
@@ -34,25 +34,24 @@ def loadAddressList(user_ID, password):
     cursor = conn.cursor()
     cursor.execute("""SELECT addr FROM addrList WHERE user_ID=? ORDER BY num""", (user_ID,))
     for addr in cursor.fetchall():
-        addrList.append(fromJson(addr[0]).decryptPrivateKey(password))
+        addrList.append(fromJson(addr[0]))
     conn.close()
     return addrList
 
-def add_address(user_ID, newAddr, num, password):
+def add_address(user_ID, newAddr, num):
     """Add the new actual address on the DB
        The last address on the list is the actual address
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     tmp = deepcopy(newAddr)
-    tmp.encryptPrivateKey(password)
     cursor.execute("""INSERT INTO addrList(user_ID, addr, num) VALUES(?,?,?)""", (user_ID, tmp.toJson(), num))
     conn.commit()
     conn.close()
 
 def userExist(user_ID, hashPassword):
     """Check in the DB if the user exist AND have enter the good password
-       Return the actualAddress of the user if id and hashPassword are correct
+       Return True if id and hashPassword of the user are correct
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()

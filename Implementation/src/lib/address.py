@@ -2,7 +2,7 @@ import json
 from Crypto.PublicKey import DSA
 
 # local imports
-from lib.utils import ripemd_160, encrypt_AES, decrypt_AES, intToBytes
+from lib.utils import ripemd_160, sha_256, encrypt_AES, decrypt_AES, intToBytes
 
 class Address(object):
     """manage DSA asymetric keys and adds some methods
