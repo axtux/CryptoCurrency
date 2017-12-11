@@ -10,7 +10,7 @@ from lib.updater import Updater
 
 class Miner:
 
-    FLAG=10 #number of iteration of mining before check if the block has been found
+    FLAG=5000000 #number of iteration of mining before check if the block has been found
 
 
     def __init__(self, blockchain, address, relay):
@@ -34,7 +34,7 @@ class Miner:
         self.create_block()
         while(1):
             if(self.flag == 0): #Check if a new block has been found
-                self.flag = 10
+                self.flag = Miner.FLAG
                 if self.update_blockchain(): # New block has been found
                     self.create_block()
             else:
