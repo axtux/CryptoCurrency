@@ -1,5 +1,5 @@
 from lib.walletConnection import Connection
-from lib.utils import sha_256, encrypt_AES, decrypt_AES, intToBytes
+from lib.utils import sha_256
 from lib.address import Address
 import os
 
@@ -38,18 +38,6 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 if __name__ == '__main__':
-    a = Address()
-    print(type(a.dsa.x))
-    print(a.dsa.x)
-    password = "veryGoodPassword"
-    hashPass = sha_256(password)
-    key = hashPass[16:48]
-    iv = hashPass[:16]
-    ci = encrypt_AES(key, intToBytes(a.dsa.x), iv)
-    pl = decrypt_AES(key, ci, iv)
-    print(ci)
-    print(pl)
-    """
     conn = Connection()
     clear()
     print("Hello")
@@ -92,4 +80,5 @@ if __name__ == '__main__':
             manuel()
         print("\n\n\n")
         command = input("What do you what to do ? (type 'man' for the list of action)")
-"""
+
+    print("Good Bye !")

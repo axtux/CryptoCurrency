@@ -14,27 +14,27 @@ class Wallet(object):
     Wallet have money and can create some Transaction to send money to an another Wallet
     """
 
-    def __init__(self, user_ID, AES_Key=None):
+    def __init__(self, user_ID, password):
         """Create a new wallet
 
-        user_ID : The ID of the user to select it's own address on the DB
-        AES_key : The AES key of the user using to encrypt / decrypt his private key
-        addr    : The current adress of the user
+        user_ID  : The ID of the user to select it's own address on the DB
+        password : The password is used to generate a AES_Key and ecrypt / decrypt the private key on DB
+                   Here, we used it to load all the address or write the new address
         """
         self.blockChain = Blockchain()
         self.relay = RelayClient()
         self.updater = Updater(self.blockChain, self.relay)
         self.updater.update()
         self.user_ID = user_ID
-        self.addrList = loadAddressList(self.user_ID)   # list of address
+        self.addrList = loadAddressList(self.user_ID, password)   # list of address
         self.last = len(self.addrList)-1    #index of the actual address
         if self.addrList == []:    #New Wallet : Create the first Address
             self.addr = Address()
+            add_address(self.user_ID, self.addr, 0, password)
             self.addrList.append(self.addr)
         else:
             self.addr = self.addrList[len(self.addrList)-1]
-        #self.count = self.blockChain.get_amount_of_address(self.addr)
-        self.count = 0
+        self.count = self.blockChain.get_amount_of_address(self.addr)
 
     def checkUpdate(self):
         """Update the amount and the blockChain
@@ -42,20 +42,6 @@ class Wallet(object):
         # TODO peut-être la mettre dans Updater
         self.updater.update()
         self.count = self.blockChain.get_amount_of_address(self.addr)
-
-    def checkCount(self):
-        """Check, with the actual address, the Wallet value in the BlockChain
-        """
-        # TODO Methode non utile, à déplacé dans blockChain ou supprimé
-        count = 0
-        block = self.blockChain.get_next_block(self.blockChain.FIRST_HASH)
-        while block != None:
-            for trans in block.transactions:
-                for dest,val in trans.receiver,trans.values:
-                    if dest == self.addr.address:
-                        count += val
-            block = self.blockChain.get_next_block(block.get_hash())
-        return count
 
     def createTransaction(self, password, destList):
         """Create a new transaction and send it to the RelayNode
@@ -67,14 +53,13 @@ class Wallet(object):
         hashPass = sha_256(password)
         newAddr = Address()
         if len(moneyList) == len(destList) and sum(moneyList) <= self.count:
-            moneyList.append(self.count - sum(moneyList))
-            destList.append(newAddr.address)
+            destList.append( str(newAddr), (self.count - sum(moneyList)) )
             transac = transaction(self.addr.public(), destList)
             transac.sign(self.addr)
             self.relay.submit_transaction(transac)
             self.addrList.append(newAddr)
             self.addr = newAddr
-            add_address(self.user_ID, self.addr, len(self.addrList)-1, hashPass[16:48])
+            add_address(self.user_ID, self.addr, len(self.addrList)-1, password)
             return True
         else:
             return False
