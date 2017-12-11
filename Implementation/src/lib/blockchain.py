@@ -78,6 +78,7 @@ class Blockchain(object):
             sender = t.senderAddress()
             self.db.set_address_spent(sender, True)
             self.update_addresses_amount(t.receivers)
+        return True
 
     def update_addresses_amount(self, receivers):
         for address, amount in receivers:
