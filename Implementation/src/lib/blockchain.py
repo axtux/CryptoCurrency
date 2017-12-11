@@ -224,6 +224,7 @@ def print_addresses(db):
 
 if __name__ == '__main__':
 
+    
     conn = sqlite3.connect("databases.blockchain.db")
     cursor = conn.cursor()
     print("deleting DB")
@@ -238,7 +239,6 @@ if __name__ == '__main__':
     """)
     conn.commit()
     print("destroyed")
-    
 
     print("NEW TEST:\n")
     blockchain = Blockchain()
@@ -252,28 +252,13 @@ if __name__ == '__main__':
     db = blockchain.db
     previousHash = blockchain.get_last_hash()
 
-    password = "veryGoodPassword"
-    key = sha_256(password)[:32].encode('utf-8')
-    mess = "bonjour"
+    sender = Address()
+    receiver1 = Address()
+    receiver2 = Address()
+    transactions = [Transaction(sender.public(), [str(receiver1), str(receiver2)], [123, 321])]
     #iv = iv()
-    password2 = "notSoVeryGoodPassword"
-    key2 = sha_256(password2)[:32].encode('utf-8')
-    mess2 = "bonjour2"
-    #iv = iv()
-    password3 = "notSoVeryGoodPassword"
-    key3 = sha_256(password2)[:32].encode('utf-8')
-    mess3 = "bonjour3"
-    #iv = iv()
-    sender = Address(AES_Key=key)
-    receiver1 = Address(AES_Key=key2)
-    receiver2 = Address(AES_Key=key3)
-    transactions = [Transaction(sender.publicKey, [receiver1.address, receiver2.address], [123, 321])]
-    miner_pasword = "veryGoodPassword"
-    key_miner = sha_256(password)[:32].encode('utf-8')
-    mess_miner = "bonjour"
-    #iv = iv()
-    miner_address = Address(AES_Key=key_miner)
-    block = Block(previousHash, miner_address.address, transactions)
+    miner_address = Address()
+    block = Block(previousHash, str(miner_address), transactions)
     block.set_proof("43334")
     json_block = block.toJson()
 
@@ -294,15 +279,15 @@ if __name__ == '__main__':
     print("printing adress DB")
     print_addresses(db)
 
-    db.add_address(sender.address, 0, 1)
-    db.add_address(receiver1.address, 123, 0)
-    db.add_address(receiver2.address, 321,0)
+    db.add_address(str(sender), 0, 1)
+    db.add_address(str(receiver1), 123, 0)
+    db.add_address(str(receiver2), 321,0)
     print("printing address DB after havin added")
     print_addresses(db)
-    db.set_address_amount(sender.address, 100)
+    db.set_address_amount(str(sender), 100)
     print("printing address DB after modification")
     print_addresses(db)
-    db.set_address_spent(sender.address, 0)
+    db.set_address_spent(str(sender), 0)
     print("printing address DB after modification")
     print_addresses(db)
 
