@@ -70,24 +70,27 @@ class Blockchain(object):
         self.db.set_last_hash(sha_256(str(block)))
         self.db.add_json_block(blockchain.db.get_last_hash(), block.toJson())
         for i in range(len(block.transactions)):
-            temp = self.get_address(block.transactions[i].receiver)
+            print(type(block.transactions[i].sender_public_key))
+            temp = self.db.get_address(block.transactions[i].senderAddress())
             if temp == None:
-                # On cherche si l'addresse a deja ete utilise pour recevoir. Si non on la rajoute
-                self.write_in_address_DB(block.transactions[i].receiver, block.transactions[i].amount, False);
-            else:
-                # Si oui on update son argent
-                temp_amount = int(temp[1]) + block.transactions[i].amount
-                self.db.set_address_amount(block.transactions[i].receiver, temp_amount)
-            temp = self.select_address(block.transactions[i].sender)
-            if temp == None:
-                # On cherche si l'addresse d'envoi existe deja. Si non on la rajoute et on met le bon flag
+            # On cherche si l'addresse d'envoi existe deja. Si non on la rajoute et on met le bon flag
                 self.db.add_address(block.transactions[i].sender, block.transactions[i].amount, True);
             else:
-                # Si oui, on update la valeur et on met le bon flag
+            # Si oui, on update la valeur et on met le bon flag
                 temp_amount = int(temp[1]) - block.transactions[i].amount
                 self.db.set_address_amount(block.transactions[i].sender, temp_amount)
                 self.db.set_address_spent(block.transactions[i].sender, True)
-        self.db.set_last_hash(block.hash())
+            for j in range(len(block.transactions[i])):
+                temp = self.db.get_address(block.transactions[i].receivers)
+                if temp == None:
+                    # On cherche si l'addresse a deja ete utilise pour recevoir. Si non on la rajoute
+                    self.write_in_address_DB(block.transactions[i].receiver, block.transactions[i].amount, False);
+                else:
+                # Si oui on update son argent
+                    temp_amount = int(temp[1]) + block.transactions[i].amount
+                    self.db.set_address_amount(block.transactions[i].receiver, temp_amount)
+                
+            self.db.set_last_hash(block.hash())
 
 
 class BlockchainDatabase(object):

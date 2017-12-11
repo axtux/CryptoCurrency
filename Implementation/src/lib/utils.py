@@ -25,7 +25,7 @@ def encrypt_AES(key, m, iv):
 def decrypt_AES(key, m, iv):
     """Decrypt a byte string cipherText with a key and a random iv
     """
-    return AES.new(key, AES.MODE_CFB, iv).decrypt(intToBytes(m))
+    return bytesToInt(AES.new(key, AES.MODE_CFB, iv).decrypt(intToBytes(m)))
 
 def generateAESKey():
     """Generate a random AES-128 key
@@ -88,13 +88,18 @@ if __name__ == '__main__':
     """
 
 
-    #AES-128 test
-    mess = b'Hello World !'
-    # key1 and key2 are the same keys
-    key1 = b'Sixteen byte key'
+    password = "veryGoodPassword"
+    hashPass = sha_256(password)
 
-    iv = Random.new().read(AES.block_size)
-    ci = encrypt_AES(key1, mess, iv)
-    pl = decrypt_AES(key1, ci, iv)
+    #AES-128 test
+    mess = 55
+    # key1 and key2 are the same keys
+    key1 = 'Sixteen byte key'
+
+    #iv = Random.new().read(AES.block_size)
+    key = hashPass[16:48]
+    iv = hashPass[:16]
+    ci = encrypt_AES(key, mess, iv)
+    pl = decrypt_AES(key, ci, iv)
     print(ci)
     print(pl)

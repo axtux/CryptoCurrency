@@ -2,7 +2,7 @@ import json
 from Crypto.PublicKey import DSA
 
 # local imports
-from lib.utils import ripemd_160
+from lib.utils import ripemd_160, encrypt_AES, decrypt_AES, intToBytes
 
 class Address(object):
     """manage DSA asymetric keys and adds some methods
@@ -32,13 +32,25 @@ class Address(object):
         """
         k = self.dsa
         return ripemd_160([str(k.y), str(k.g), str(k.p), str(k.q)])
-    
+
     def __eq__(self, other):
         return self.toJson() == other.toJson()
-    
+
     def public(self):
         return Address(self.dsa.publickey())
-    
+
+    def encryptPrivateKey(self, password):
+        """Encrypt the private key with AES
+        """
+        hashPass = sha_256(password)
+        self.dsa.x = encrypt_AES(hashPass[16:48], intToBytes(self.dsa.x), hashPass[:16])
+
+    def decryptPrivateKey(self, password):
+        """DEcrypt the private key with AES
+        """
+        hashPass = sha_256(password)
+        self.dsa.x = decrypt_AES(hashPass[16:48], self.dsa.x, hashPass[:16])
+
     def toJson(self):
         data = {}
         # public key fields
@@ -52,7 +64,7 @@ class Address(object):
         except AttributeError:
             pass
         return json.dumps(data)
-    
+
     @staticmethod
     def fromJson(json_dsa):
         try:
