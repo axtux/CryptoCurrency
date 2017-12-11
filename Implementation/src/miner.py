@@ -27,7 +27,10 @@ class Miner:
     def get_ordered_transactions(self):
         """Allow to choose wich transactions will be placed in the block
         For now, it just take them in the chronological order"""
-        return self.relay.get_transactions()
+        ts = self.relay.get_transactions()
+        if ts == None:
+            return []
+        return ts
 
     def run(self,strategy):
         """Strategy is the function called to find the next PoW"""
