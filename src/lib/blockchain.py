@@ -5,6 +5,7 @@ from lib.utils import sha_256
 from lib.block import Block
 from lib.transaction import Transaction
 from lib.address import Address
+from lib.log import debug, warning
 
 """API
 get_last_hash(): string
@@ -43,15 +44,15 @@ class Blockchain(object):
 
     def get_last_hash(self):
         h = self.db.get_last_hash()
-        if h == None:
+        if h is None:
             return Blockchain.FIRST_HASH
         return h
 
     def get_next_block(self, previous_hash):
         json = self.db.get_json_block(previous_hash)
-        if json == None:
+        if json is None:
             return None
-        return Block.fromJson(json)
+        return Block.fromJson(json[0])
 
     def get_amount_of_address(self, address):
         r = self.db.get_address(str(address))
@@ -68,12 +69,15 @@ class Blockchain(object):
     def add_block(self, block):
         # check last hash
         if self.get_last_hash() != block.previous_hash:
+            warning('last hash not matching')
             return False
 
         # check transactions validity
         if not block.is_valid(self):
+            warning('block not valid')
             return False
 
+        debug('accepted block')
         # add block, save THEN change last hash
         self.db.add_json_block(self.get_last_hash(), block.toJson())
         self.db.set_last_hash(block.get_hash())
@@ -145,7 +149,7 @@ class BlockchainDatabase(object):
 
     def get_json_block(self, previous_hash):
         cursor = self.conn.cursor()
-        sql = "SELECT previous_hash, json_block FROM blocks WHERE previous_hash=?"
+        sql = "SELECT json_block FROM blocks WHERE previous_hash=?"
         cursor.execute(sql, (previous_hash,))
         return cursor.fetchone()
 
