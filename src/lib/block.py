@@ -39,9 +39,16 @@ class Block:
         """Check that hash starts with some zeros
         and that addresses are valid
         """
+        # only one transaction per sender
+        senders = [t.senderAddress() for t in self.transactions]
+        if len(senders) != len(set(senders)):
+            print('2 transactions from sender '+sender)
+            return False
+        # check amount from senders
         for t in self.transactions:
             if not t.is_valid(blockchain):
                 return False
+        # check difficulty
         return self.hash[:Block.DIFFICULTY] == '0'* Block.DIFFICULTY
 
     def toJson(self):
