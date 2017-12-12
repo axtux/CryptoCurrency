@@ -18,12 +18,21 @@ class Test(unittest.TestCase):
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
     
-    def test_json(self):
+    def test_json_1(self):
         a = Address()
         bc = TestBlockchain()
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
         t.toJson()
+    
+    def test_json_2(self):
+        a = Address()
+        bc = TestBlockchain()
+        rs = [('lui', 2), ('elle', 3)]
+        t = Transaction(a.public(), rs)
+        t.sign(a)
+        t2 = Transaction.fromJson(t.toJson())
+        self.assertEqual(t.toJson(), t2.toJson())
     
     def test_total_amount(self):
         a = Address()
