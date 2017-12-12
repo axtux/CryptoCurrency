@@ -6,7 +6,7 @@ from lib.transaction import Transaction
 from lib.log import debug, warning
 
 class Block:
-    DIFFICULTY = 5
+    DIFFICULTY = 6
     MAX_TRANSACTIONS = 50
 
     def __init__(self, previous_hash, miner_address, transactions=[]):
