@@ -12,8 +12,21 @@ class Test(unittest.TestCase):
         b = Address(a.dsa)
         self.assertTrue(self.equalAddresses(a, b))
     
+    def test_encrypted(self):
+        a = Address()
+        b = Address(a.dsa)
+        b.encryptPrivateKey('pwd')
+        b.decryptPrivateKey('pwd')
+        self.assertTrue(self.equalAddresses(a, b))
+    
     def test_json(self):
         a = Address()
+        b = Address.fromJson(a.toJson())
+        self.assertTrue(self.equalAddresses(a, b))
+        
+    def test_encrypted_json(self):
+        a = Address()
+        a.encryptPrivateKey('pwd')
         b = Address.fromJson(a.toJson())
         self.assertTrue(self.equalAddresses(a, b))
     
