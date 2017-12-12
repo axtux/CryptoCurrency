@@ -24,7 +24,8 @@ class Transaction(object):
         """
         # avoid transporting private key with transaction
         self.sender_public_key = sender_public_key.public()
-        self.receivers = receivers
+        # JSON jump needed to have save representation and same signature
+        self.receivers = json.loads(json.dumps(receivers))
         self.signature = None
 
     def sign(self, private_key):
@@ -33,17 +34,22 @@ class Transaction(object):
         """
         if private_key.public() != self.sender_public_key:
             return False
+        # TODO use true random number :-/
         k = random.randint(2, private_key.dsa.q - 1)
-        m = sha_256_bytes(self.toJson(False))
+        m = sha_256_bytes(str(self.sender_public_key)+str(self.receivers))
         self.signature = private_key.dsa.sign(m,k)
 
     def is_signed(self):
         """Return True if the transaction is correctly sign
         """
         if self.signature is None:
+            debug('no signature')
             return False
-        m = sha_256_bytes(self.toJson(False))
-        return self.sender_public_key.dsa.verify(m, self.signature)
+        m = sha_256_bytes(str(self.sender_public_key)+str(self.receivers))
+        signed = self.sender_public_key.dsa.verify(m, self.signature)
+        if not signed:
+            debug('bad signature')
+        return signed
 
     def get_total_amount(self):
         """Return total amount of money processed
@@ -78,11 +84,11 @@ class Transaction(object):
         """
         return str(self.sender_public_key)
 
-    def toJson(self, signature=True):
+    def toJson(self):
         return json.dumps({
                 "sender_public_key": self.sender_public_key.toJson(),
                 "receivers": self.receivers,
-                "signature": self.signature if signature else None,
+                "signature": self.signature,
             })
 
     @staticmethod
