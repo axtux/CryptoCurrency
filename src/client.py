@@ -32,9 +32,9 @@ def makeTransaction(wallet):
 
 def manuel():
     print("This is a list of possible command : \n")
-    print("show        : Show your Wallet information with the money in your address")
-    print("transaction : Create a new transaction")
-    print("back        : Go back to an ald address if your last transaction was not validate")
+    print("show   : Show your Wallet information with the money in your address")
+    print("trans  : Create a new transaction")
+    print("back   : Go back to an ald address if your last transaction was not validate")
 
 def backAddress(wallet):
     """Return to the previous address
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     while command != 'close':
         if command == 'show':
             showDetails(wallet)
-        if command == 'transaction':
+        if command == 'trans':
             makeTransaction(wallet)
         if command == 'back':
             backAddress(wallet)
@@ -88,6 +88,8 @@ if __name__ == '__main__':
         if command == 'man':
             manuel()
         print("\n\n\n")
+        manuel()
+        print()
         command = input("What do you what to do ? (type 'man' for the list of action)")
 
     print("Good Bye !")
