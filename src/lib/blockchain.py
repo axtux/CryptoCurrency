@@ -25,6 +25,7 @@ class Blockchain(object):
     for now, this class assumes transactions are valid
     """
     FIRST_HASH = sha_256("42")
+    REWARD = 10 # for each mined block
 
     def __init__(self, name):
         self.db = BlockchainDatabase(name)
@@ -69,9 +70,12 @@ class Blockchain(object):
         if not block.is_valid(self):
             return False
 
-        # add block
+        # add block, save THEN change last hash
+        self.db.add_json_block(self.get_last_hash(), block.toJson())
         self.db.set_last_hash(block.get_hash())
-        self.db.add_json_block(self.db.get_last_hash(), block.toJson())
+
+        # reward sender
+        self.update_addresses_amount([(block.miner_address, Blockchain.REWARD)])
 
         # transactions are already checked within block
         for t in block.transactions:
