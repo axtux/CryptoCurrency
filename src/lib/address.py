@@ -2,7 +2,7 @@ import json
 from Crypto.PublicKey import DSA
 
 # local imports
-from lib.utils import ripemd_160, sha_256, encrypt_AES, decrypt_AES, intToBytes
+from lib.utils import ripemd_160, aes
 
 class Address(object):
     """manage DSA asymetric keys and adds some methods
@@ -29,14 +29,14 @@ class Address(object):
     def encryptPrivateKey(self, password):
         """Encrypt the private key with AES
         """
-        hashPass = sha_256(password)
-        self.dsa.x = encrypt_AES(hashPass[16:48], intToBytes(self.dsa.x), hashPass[:16])
+        # encoding key as numeric string is fine
+        self.dsa.x = aes(password).encrypt(str(self.dsa.x)).hex()
 
     def decryptPrivateKey(self, password):
         """DEcrypt the private key with AES
         """
-        hashPass = sha_256(password)
-        self.dsa.x = decrypt_AES(hashPass[16:48], self.dsa.x, hashPass[:16])
+        # decode int from numeric string
+        self.dsa.x = int(aes(password).decrypt(bytes.fromhex(self.dsa.x)))
 
     def toJson(self):
         data = {}

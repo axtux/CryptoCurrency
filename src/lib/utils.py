@@ -18,24 +18,9 @@ def intToBytes(n):
 def bytesToInt(b):
     return int.from_bytes(b, 'big')
 
-def encrypt_AES(key, m, iv):
-    """Encrypt a byte string plainText with a key and a random iv
-    """
-    return bytesToInt(AES.new(key, AES.MODE_CFB, iv).encrypt(m))
-
-def decrypt_AES(key, m, iv):
-    """Decrypt a byte string cipherText with a key and a random iv
-    """
-    return bytesToInt(AES.new(key, AES.MODE_CFB, iv).decrypt(intToBytes(m)))
-
-def generateAESKey():
-    """Generate a random AES-128 key
-        The "0x" at the begining of the hex number is remove for some function (bytes.fromhex)
-    """
-    return hex(random.getrandbits(128))[2:]
-
-def iv():
-    return Random.new().read(AES.block_size)
+def aes(pwd):
+    h = sha_256(pwd)
+    return AES.new(h[16:48], AES.MODE_CFB, h[:16])
 
 def sha_256(text):
     """hash the content of text
