@@ -8,6 +8,7 @@ from lib.updater import Updater
 from lib.walletDB import loadAddressList, add_address
 from lib.http_client import RelayClient
 from lib.transaction import Transaction
+from lib.log import debug
 
 class Wallet(object):
     """Wallet is the principal user
@@ -58,6 +59,7 @@ class Wallet(object):
         """
         self.checkUpdate()
         newAddr = Address()
+        debug('x='+str(newAddr.dsa.x))
         newAddr.encryptPrivateKey(password)
         total = sum([ i[1] for i in destList ])
         if total <= self.count:
@@ -65,6 +67,8 @@ class Wallet(object):
             transac = Transaction(self.addr.public(), destList)
             self.addr.decryptPrivateKey(password)
             transac.sign(self.addr)
+            debug('x='+str(newAddr.dsa.x))
+            debug('valid: '+('True' if transac.is_signed() else 'False'))
             self.addr.encryptPrivateKey(password)
             if not self.relay.submit_transaction(transac):
                 return False
