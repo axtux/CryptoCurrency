@@ -123,7 +123,7 @@ class RelayHandler(EasyHandler):
             self.no_response(200) # OK
             self.broadcast_transaction(t)
 
-    def broadcast_transaction(t):
+    def broadcast_transaction(self, t):
         for r in self.server.relays:
             r.post_transaction(t)
 
