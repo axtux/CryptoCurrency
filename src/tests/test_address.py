@@ -28,6 +28,11 @@ class Test(unittest.TestCase):
         b = Address.fromJson(a.toJson())
         self.assertTrue(self.equalAddresses(a, b))
         
+    def test_json_equal(self):
+        a = Address()
+        b = Address.fromJson(a.toJson())
+        self.assertEqual(a.toJson(), b.toJson())
+        
     def test_encrypted_json(self):
         a = Address()
         a.encryptPrivateKey('pwd')
