@@ -2,7 +2,7 @@ import sqlite3
 from lib.address import Address
 
 
-DB_PATH = 'databases/client.db'
+DB_PATH = 'databases/wallet.db'
 
 def createDB():
     """Create all using data bases
