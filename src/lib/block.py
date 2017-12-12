@@ -3,6 +3,7 @@ import json
 
 # local imports
 from lib.transaction import Transaction
+from lib.log import debug, warning
 
 class Block:
     DIFFICULTY = 5
@@ -12,6 +13,7 @@ class Block:
         self.previous_hash = previous_hash
         self.miner_address = miner_address
         self.set_transactions(transactions)
+        self.set_proof('')
 
     def set_transactions(self, transactions):
         # add a maximum of transactions
@@ -35,21 +37,24 @@ class Block:
     def get_hash(self):
         return self.hash
 
-    def is_valid(self, blockchain):
-        """Check that hash starts with some zeros
-        and that addresses are valid
-        """
+    def valid_transactions(self, blockchain):
         # only one transaction per sender
         senders = [t.senderAddress() for t in self.transactions]
         if len(senders) != len(set(senders)):
-            print('2 transactions from sender '+sender)
+            warning('at least 2 transactions from sender '+sender)
             return False
         # check amount from senders
         for t in self.transactions:
             if not t.is_valid(blockchain):
+                warning('at least one invalid transaction')
                 return False
-        # check difficulty
+        return True
+
+    def good_difficulty(self):
         return self.hash[:Block.DIFFICULTY] == '0'* Block.DIFFICULTY
+
+    def is_valid(self, blockchain):
+        return self.valid_transactions(blockchain) and self.good_difficulty()
 
     def toJson(self):
         return json.dumps({
