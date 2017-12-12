@@ -13,7 +13,7 @@ def makeTransaction(wallet):
     clear()
     addr  = input("Please, enter the address to send the money\n")
     money = input("Please, enter the amount of money do you want to send to "+addr+"\n")
-    receivers = [ (addr,money) ]
+    receivers = [ (addr,int(money)) ]
     while True:
         again = input("Do you want to make an another transfer in your transaction ? (y or n)")
         while again != 'y' and again != 'n':
