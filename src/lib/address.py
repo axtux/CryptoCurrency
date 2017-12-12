@@ -29,14 +29,24 @@ class Address(object):
     def encryptPrivateKey(self, password):
         """Encrypt the private key with AES
         """
+        if not self.dsa.has_private():
+            return
         # encoding key as numeric string is fine
-        self.dsa.x = aes(password).encrypt(str(self.dsa.x)).hex()
+        self.enc = aes(password).encrypt(str(self.dsa.x)).hex()
+        # only public key
+        self.dsa = self.dsa.publickey()
 
     def decryptPrivateKey(self, password):
         """DEcrypt the private key with AES
         """
+        if self.dsa.has_private() or self.enc is None:
+            return
         # decode int from numeric string
-        self.dsa.x = int(aes(password).decrypt(bytes.fromhex(self.dsa.x)))
+        x = int(aes(password).decrypt(bytes.fromhex(self.enc)))
+        # build private key
+        d = self.dsa
+        self.dsa = DSA.construct((d.y, d.g, d.p, d.q, x))
+        self.enc = None
 
     def toJson(self):
         data = {}
@@ -50,17 +60,24 @@ class Address(object):
             data['x'] = self.dsa.x
         except AttributeError:
             pass
+        try:
+            data['enc'] = self.enc
+        except AttributeError:
+            pass
         return json.dumps(data)
 
     @staticmethod
     def fromJson(json_dsa):
         try:
             data = json.loads(json_dsa)
-            if ('x' in data): # private key
+            if 'x' in data: # private key
                 t = (data['y'], data['g'], data['p'], data['q'], data['x'])
             else: # only public key
                 t = (data['y'], data['g'], data['p'], data['q'])
-            return Address(DSA.construct(t))
+            a = Address(DSA.construct(t))
+            if 'enc' in data:
+                a.enc = data['enc']
+            return a
         # JSON ValueError for decode
         # KeyError if no accessed key
         # DSA TypeError if not int
