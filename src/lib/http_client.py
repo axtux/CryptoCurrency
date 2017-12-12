@@ -23,7 +23,7 @@ class MasterClient(object):
             return None
         if not r.status_code == 200:
             return None
-        return Block.fromJson(r.text())
+        return Block.fromJson(r.text)
 
     def submit_block(self, block):
         """send POST request with JSON encoded block to self.url/blocks/
