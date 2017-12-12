@@ -63,7 +63,7 @@ if __name__ == '__main__':
     clear()
     isNew = (isNew == 'y')    #True if 'y', False if 'n'
     wallet = conn.allowConnection(user_ID, password, isNew)
-    while wallet == None:
+    while wallet is None:
         print("You make a mistake, please retry")
         if isNew:
             print("Maybe this user ID already exist")

@@ -32,14 +32,14 @@ class EasyHandler(BaseHTTPRequestHandler):
 
     def get_block(self, previous_hash):
         block = self.server.blockchain.get_next_block(previous_hash)
-        if block == None:
+        if block is None:
             self.no_response(204) # No Content
         else:
             self.json_response(200, block.toJson())
 
     def post_block(self, json):
         b = Block.fromJson(json)
-        if b == None:
+        if b is None:
             self.no_response(400) # Bad Request
         elif not self.server.blockchain.add_block(b):
             self.no_response(400) # Bad Request
@@ -102,7 +102,7 @@ class RelayHandler(EasyHandler):
     def post_block(self, json):
         # TODO submit to master before response
         b = EasyHandler.post_block(self, json)
-        if not b == None:
+        if not b is None:
             # if block is ok, submit to master
             self.server.master.submit_block(Block.fromJson(json))
 
@@ -112,7 +112,7 @@ class RelayHandler(EasyHandler):
 
     def post_transaction(self, json):
         t = Transaction.fromJson(json)
-        if t == None:
+        if t is None:
             self.no_response(400) # Bad Request
         elif not t.is_valid(self.server.blockchain):
             self.no_response(400) # Bad Request

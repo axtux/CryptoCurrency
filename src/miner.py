@@ -29,7 +29,7 @@ class Miner:
         """Allow to choose wich transactions will be placed in the block
         For now, it just take them in the chronological order"""
         ts = self.relay.get_transactions()
-        if ts == None:
+        if ts is None:
             return []
         return ts
 

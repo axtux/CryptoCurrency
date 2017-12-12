@@ -8,7 +8,7 @@ from lib.log import debug
 class Updater(object):
     def __init__(self, blockchain, relay=None):
         self.blockchain = blockchain
-        if relay == None:
+        if relay is None:
             self.relay = RelayClient()
         else:
             self.relay = relay

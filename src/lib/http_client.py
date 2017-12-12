@@ -46,7 +46,7 @@ class RelayClient(MasterClient):
         if relay is None, random relay is chosen from Network
         """
         servers = Network.get_relays()
-        if relay == None:
+        if relay is None:
             relay = servers[randint(0, len(servers)-1)]
         self.url = 'http://'+relay[0]+':'+str(relay[1])+'/'
 

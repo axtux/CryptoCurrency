@@ -62,7 +62,7 @@ class Blockchain(object):
 
     def is_spent(self, address):
         r = self.db.get_address(address)
-        if r == None:
+        if r is None:
             return False
         return bool(r[2])
 
@@ -95,7 +95,7 @@ class Blockchain(object):
     def update_addresses_amount(self, receivers):
         for address, amount in receivers:
             tmp = self.db.get_address(address)
-            if tmp == None: # do not exists
+            if tmp is None: # do not exists
                 self.db.set_address_amount(address, amount)
             else:
                 new_amount = int(tmp[1]) + amount
@@ -169,7 +169,7 @@ class BlockchainDatabase(object):
         cursor = self.conn.cursor()
         cursor.execute("SELECT hash FROM last_hash")
         res = cursor.fetchone()
-        if res == None:
+        if res is None:
             return res
         else:
             return res[0]
@@ -183,7 +183,7 @@ class BlockchainDatabase(object):
 
     def set_last_hash(self, last_hash):
         cursor = self.conn.cursor()
-        if self.get_last_hash() == None:
+        if self.get_last_hash() is None:
             sql = "INSERT INTO last_hash  (void, hash) VALUES (?, ?)"
             cursor.execute(sql, (0, last_hash))
         else:
