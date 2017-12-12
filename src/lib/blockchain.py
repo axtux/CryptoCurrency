@@ -36,6 +36,7 @@ class Blockchain(object):
         temp = "\n"
         hash_temp = Blockchain.FIRST_HASH
         next_block = self.get_next_block(hash_temp)
+        i = 0
         while next_block != None:
             temp += "block " + str(i) + " is \n" + str(next_block) + "\n"
             i += 1
