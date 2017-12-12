@@ -1,6 +1,9 @@
 import json
 import random
+
+# local imports
 from lib.utils import sha_256_bytes
+from lib.log import debug
 
 """API
 
@@ -57,12 +60,17 @@ class Transaction(object):
         """
         total = self.get_total_amount()
         if total == False or total < 1:
+            debug('total amount of transaction < 1')
             return False
         available = blockchain.get_amount_of_address(self.sender_public_key)
         if available < 1:
+            debug('amount available < 1')
             return False
         fee = available - total
-        return self.is_signed() and fee >= 0
+        if fee < 0:
+            debug('available < total')
+            return False
+        return self.is_signed()
 
     def senderAddress(self):
         """Return the sender address from the public key
