@@ -8,7 +8,7 @@ from lib.transaction import Transaction
 from lib.block import Block
 from lib.blockchain import Blockchain
 from lib.http_client import MasterClient, RelayClient
-
+from lib.log import debug
 
 class EasyHandler(BaseHTTPRequestHandler):
     error_message_format = ''
@@ -113,8 +113,10 @@ class RelayHandler(EasyHandler):
     def post_transaction(self, json):
         t = Transaction.fromJson(json)
         if t is None:
+            debug('JSON error')
             self.no_response(400) # Bad Request
         elif not t.is_valid(self.server.blockchain):
+            debug('invalid blockchain transaction')
             self.no_response(400) # Bad Request
         else:
             self.server.transactions.append(t)
