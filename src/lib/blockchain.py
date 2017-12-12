@@ -38,7 +38,7 @@ class Blockchain(object):
         next_block = self.get_next_block(hash_temp)
         i = 0
         while next_block != None:
-            temp += "block " + str(i) + " is \n" + str(next_block) + "\n"
+            temp += "block " + str(i) + " is \n" + str(next_block.toJson()) + "\n"
             i += 1
             hash_temp = next_block.get_hash()
             next_block = self.get_next_block(hash_temp)
@@ -240,92 +240,107 @@ def print_addresses(db):
     db.conn.commit()
 
 if __name__ == '__main__':
+
     """
      the next lines are some tests of our functions
     """
-    conn = sqlite3.connect("databases.blockchain.db")
-    cursor = conn.cursor()
-    print("deleting DB")
-    cursor.execute("""
-        DROP TABLE blocks
-    """)
-    cursor.execute("""
-        DROP TABLE addresses
-    """)
-    cursor.execute("""
-        DROP TABLE last_hash
-    """)
-    conn.commit()
-    print("destroyed")
+
 
     print("NEW TEST:\n")
-    blockchain = Blockchain('test')
+    blockchain = Blockchain("blockchain")
+    print("empty blockchain")
+    print(blockchain)
     db = blockchain.db
     previousHash = blockchain.get_last_hash()
-
+    print("previousHash")
+    print(previousHash)
 
     print("TESTING Blocks DB")
 
-    blockchain = Blockchain('test')
-    db = blockchain.db
-    previousHash = blockchain.get_last_hash()
-
-    sender = Address()
-    receiver1 = Address()
-    receiver2 = Address()
-    transactions = [Transaction(sender.public(), ([str(receiver1), str(receiver2)], [123, 321]))]
+    sender_address = Address()
+    receiver1_address = Address()
+    receiver2_address = Address()
     miner_address = Address()
-    block = Block(previousHash, str(miner_address), transactions)
+    transaction = Transaction(sender_address.public(), [(str(receiver1_address), 123), (str(receiver2_address), 321)])
+    print("transaction")
+    print(str(transaction.toJson()))
+    block = Block(previousHash, str(miner_address), [transaction])
     block.set_proof("43334")
+    print("block")
+    print(str(block.toJson()))
     json_block = block.toJson()
+    print("json_block")
+    print(str(json_block))
 
     db.add_json_block(previousHash, json_block)
-    print("DB with block added")
+    print("updated DB")
     print_blocks(db)
 
-    """
-    db.fetch_one()
-    db.fetch_all()
-    db.commit()
-    """
-    db.get_json_block(previousHash)
-    print("get_last_hash")
-    print(db.get_last_hash())
+    db.set_last_hash(block.get_hash())
+    previousHash2 = db.get_last_hash()
+
+    sender2_address = Address()
+    receiver21_address = Address()
+    receiver22_address = Address()
+    miner2_address = Address()
+    transaction2 = Transaction(sender2_address.public(), [(str(receiver21_address), 321), (str(receiver22_address), 333)])
+    print("transaction2")
+    print(str(transaction2.toJson()))
+    block2 = Block(previousHash2, str(miner2_address), [transaction2])
+    block2.set_proof("222")
+    print("block2")
+    print(str(block2.toJson()))
+    json_block2 = block2.toJson()
+    print("json_block2")
+    print(str(json_block2))
+
+    db.add_json_block(previousHash2, json_block2)
+    print("updated DB")
+    print_blocks(db)
+    db.set_last_hash(block2.get_hash())
+    previousHash3 = db.get_last_hash()
+
+    miner3_address = Address()
+    block3 = Block(previousHash3, str(miner3_address), [transaction, transaction2])
+    block3.set_proof("96")
+    print("block3")
+    print(str(block3.toJson()))
+    json_block3 = block3.toJson()
+    print("json_block3")
+    print(str(json_block3))
+
+    db.add_json_block(previousHash3, json_block3)
+    print("updated DB")
+    print_blocks(db)
+    db.set_last_hash(block3.get_hash())
+    previousHash4 = db.get_last_hash()
+
+    print("getting block")
+    print(db.get_json_block(previousHash2))
+    print("compared to")
+    print(json_block2)
+
+    print("\n,\n,\n,\n")
 
     print("TESTING ADDRESS DB")
     print("printing adress DB")
     print_addresses(db)
 
-    db.add_address(str(sender), 0, 1)
-    db.add_address(str(receiver1), 123, 0)
-    db.add_address(str(receiver2), 321,0)
+    db.add_address(str(sender_address), 0, 1)
+    db.add_address(str(receiver1_address), 123, 0)
+    db.add_address(str(receiver2_address), 321,0)
     print("printing address DB after havin added")
     print_addresses(db)
-    db.set_address_amount(str(sender), 100)
+    db.set_address_amount(str(sender_address), 100)
     print("printing address DB after modification")
     print_addresses(db)
-    db.set_address_spent(str(sender), 0)
+    db.set_address_spent(str(sender_address), 0)
     print("printing address DB after modification")
     print_addresses(db)
+    print("getting address")
+    print(db.get_address(str(receiver1_address)))
 
 
-
-
-    print("TESTING LAST_HASH DB")
-    db.set_last_hash(sha_256("42"))
-    print(db.get_last_hash())
-    db.set_last_hash(sha_256("4"))
-    print(db.get_last_hash())
-
-
-    """
-    db.set_last_hash(sha_256("2"))
-    print(db.get_last_hash())
-    """
-
-
-
-    print("\n\n\n\n\n")
 
     conn = sqlite3.connect("databases.blockchain.db")
     cursor = conn.cursor()
@@ -342,35 +357,67 @@ if __name__ == '__main__':
     conn.commit()
     print("destroyed")
 
-    blockchain = Blockchain('test')
-
-    print("passed2")
-    blockchain.add_block(block)
-    print("passed3")
-    print("printing blockchain\n" + str(blockchain))
-    print("printing address list")
-    print_addresses(db)
-    print("finished printing address list")
+    print("\n,\n,\n,\n")
 
 
-
-
-    print("\n\n\n\n\n")
-    previousHash = blockchain.get_last_hash()
-    sender2 = Address()
-    receiver21 = Address()
-    receiver22 = Address()
-    transactions = [Transaction(sender.public(), ([str(receiver1), str(receiver2)], [10, 300]))]
-    block2 = Block(previousHash, miner_address, transactions)
-    block2.set_proof("222")
-
-    blockchain.add_block(block2)
+    print("TESTING BLOCKCHAIN:\n")
+    blockchain = Blockchain("blockchain")
+    print("empty blockchain")
     print(blockchain)
-    print("printing adresses")
-    print_addresses(db)
+    db = blockchain.db
+    previousHash = blockchain.get_last_hash()
+    print("previousHash")
+    print(previousHash)
 
-    print(blockchain.get_amount_of_address("A"))
+    print("block that is being added")
+    print(str(block.toJson()))
+    blockchain.add_block(block)
+    print("updated blockchain")
+    print(blockchain)
+    print("updated addresses DB")
+    print_addresses(db)
+    print("updated blocks DB")
+    print_blocks(db)
+    print("getting last hash")
     print(blockchain.get_last_hash())
-    print(sha_256(str(block2)))
+    print("block that is being added")
+    print(str(block2.toJson()))
+    blockchain.add_block(block2)
+    print("updated blockchain")
+    print(blockchain)
+    print("updated addresses DB")
+    print_addresses(db)
+    print("updated blocks DB")
+    print_blocks(db)
+    print("getting last hash")
+    print(blockchain.get_last_hash())
+    print("block that is being added")
+    print(str(block3.toJson()))
+    blockchain.add_block(block3)
+    print("updated blockchain")
+    print(blockchain)
+    print("updated addresses DB")
+    print_addresses(db)
+    print("updated blocks DB")
+    print_blocks(db)
+    print("getting last hash")
+    print(blockchain.get_last_hash())
+
+
+    conn = sqlite3.connect("databases.blockchain.db")
+    cursor = conn.cursor()
+    print("deleting DB")
+    cursor.execute("""
+        DROP TABLE blocks
+    """)
+    cursor.execute("""
+        DROP TABLE addresses
+    """)
+    cursor.execute("""
+        DROP TABLE last_hash
+    """)
+    conn.commit()
+    print("destroyed")
+    
 
     # we detroy the data base once we have destroyed the block chain
