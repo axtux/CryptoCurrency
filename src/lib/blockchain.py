@@ -66,6 +66,10 @@ class Blockchain(object):
         return bool(r[2])
 
     def add_block(self, block):
+        # check last hash
+        if self.get_last_hash() != block.previous_hash:
+            return False
+
         # check transactions validity
         if not block.is_valid(self):
             return False
