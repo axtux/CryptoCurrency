@@ -41,6 +41,7 @@ class Blockchain(object):
             temp += "block " + str(i) + " is \n" + str(next_block) + "\n"
             i += 1
             hash_temp = next_block.get_hash()
+            next_block = self.get_next_block(hash_temp)
         return temp + "\n"
 
     def get_last_hash(self):
