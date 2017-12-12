@@ -1,11 +1,36 @@
 import requests
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 from random import randint
 
 # local imports
 from lib.network import Network
 from lib.transaction import Transaction
 from lib.block import Block
+from lib.log import warning
 
+def get_request(url):
+    r = None
+    try:
+        r = requests.get(url)
+    except ConnectionError:
+        warning('http connection error')
+    except Timeout:
+        warning('http timeout')
+    except TooManyRedirects:
+        warning('http too many redirects')
+    return r
+
+def post_request(url, data):
+    r = None
+    try:
+        r = requests.post(url, data=data)
+    except ConnectionError:
+        warning('http connection error')
+    except Timeout:
+        warning('http timeout')
+    except TooManyRedirects:
+        warning('http too many redirects')
+    return r
 
 class MasterClient(object):
 
@@ -16,10 +41,8 @@ class MasterClient(object):
     def get_block(self, previous_hash):
         """send GET request to self.url/blocks/previous_hash
         """
-        try:
-            r = requests.get(self.url+'blocks/'+previous_hash)
-        except ConnectionRefusedError:
-            print('http error')
+        r = get_request(self.url+'blocks/'+previous_hash)
+        if r is None:
             return None
         if not r.status_code == 200:
             return None
@@ -29,10 +52,8 @@ class MasterClient(object):
         """send POST request with JSON encoded block to self.url/blocks/
         """
         data = block.toJson()
-        try:
-            r = requests.post(self.url+'blocks/', data=data)
-        except ConnectionRefusedError:
-            print('http error')
+        r = post_request(self.url+'blocks/', data)
+        if r is None:
             return False
         if r.status_code == 200:
             return True
@@ -53,10 +74,8 @@ class RelayClient(MasterClient):
     def get_transactions(self):
         """send GET request to relay/transactions/ and parse it
         """
-        try:
-            r = requests.get(self.url+'transactions/')
-        except ConnectionRefusedError:
-            print('http error')
+        r = get_request(self.url+'transactions/')
+        if r is None:
             return None
         if not r.status_code == 200:
             return None
@@ -75,10 +94,8 @@ class RelayClient(MasterClient):
         """send POST request with JSON encoded transaction to relay/transactions/
         """
         data = transaction.toJson()
-        try:
-            r = requests.post(self.url+'transactions/', data=data)
-        except ConnectionRefusedError:
-            print('http error')
+        r = post_request(self.url+'transactions/', data)
+        if r is None:
             return False
         if r.status_code == 200:
             return True
