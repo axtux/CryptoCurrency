@@ -40,8 +40,10 @@ class EasyHandler(BaseHTTPRequestHandler):
     def post_block(self, json):
         b = Block.fromJson(json)
         if b is None:
+            debug('JSON error')
             self.no_response(400) # Bad Request
         elif not self.server.blockchain.add_block(b):
+            debug('invalid block')
             self.no_response(400) # Bad Request
         else:
             self.no_response(200) # OK
