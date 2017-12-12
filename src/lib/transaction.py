@@ -4,6 +4,7 @@ import random
 # local imports
 from lib.utils import sha_256_bytes
 from lib.log import debug
+from lib.address import Address
 
 """API
 
@@ -68,7 +69,7 @@ class Transaction(object):
             return False
         fee = available - total
         if fee < 0:
-            debug('available < total')
+            debug('available('+str(available)+') < total('+str(total)+')')
             return False
         return self.is_signed()
 
@@ -88,5 +89,6 @@ class Transaction(object):
     def fromJson(data):
         data = json.loads(data)
         sender_public_key = Address.fromJson(data["sender_public_key"])
-        t = Transaction(sender_public_key, data["receivers"], data["signature"])
+        t = Transaction(sender_public_key, data["receivers"])
+        t.signature = data["signature"]
         return t
