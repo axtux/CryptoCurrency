@@ -18,39 +18,52 @@ class Test(unittest.TestCase):
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
     
-    def test_json_1(self):
+    def test_json(self):
         a = Address()
-        bc = TestBlockchain()
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
         t.toJson()
     
-    def test_json_2(self):
+    def test_json_equal(self):
         a = Address()
-        bc = TestBlockchain()
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
         t.sign(a)
         t2 = Transaction.fromJson(t.toJson())
         self.assertEqual(t.toJson(), t2.toJson())
     
+    def test_json_signed(self):
+        a = Address()
+        rs = [('lui', 2), ('elle', 3)]
+        t = Transaction(a.public(), rs)
+        t.sign(a)
+        t2 = Transaction.fromJson(t.toJson())
+        self.assertEqual(t.toJson(), t2.toJson())
+        self.assertTrue(t2.is_signed())
+    
     def test_total_amount(self):
         a = Address()
-        bc = TestBlockchain()
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
         self.assertEqual(5, t.get_total_amount())
     
     def test_not_signed(self):
         a = Address()
-        bc = TestBlockchain()
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
         self.assertFalse(t.is_signed())
     
     def test_signed(self):
         a = Address()
-        bc = TestBlockchain()
+        rs = [('lui', 2), ('elle', 3)]
+        t = Transaction(a.public(), rs)
+        t.sign(a)
+        self.assertTrue(t.is_signed())
+    
+    def test_encrypted_signed(self):
+        a = Address()
+        a.encryptPrivateKey('pwd')
+        a.decryptPrivateKey('pwd')
         rs = [('lui', 2), ('elle', 3)]
         t = Transaction(a.public(), rs)
         t.sign(a)
