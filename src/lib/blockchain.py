@@ -94,9 +94,11 @@ class Blockchain(object):
 
     def update_addresses_amount(self, receivers):
         for address, amount in receivers:
+            debug('updating '+str(address)+' by '+str(amount))
             tmp = self.db.get_address(address)
             if tmp is None: # do not exists
-                self.db.set_address_amount(address, amount)
+                debug('address '+str(address)+' does not exists, creating')
+                self.db.add_address(address, amount)
             else:
                 new_amount = int(tmp[1]) + amount
                 self.db.set_address_amount(address, new_amount)
@@ -159,7 +161,7 @@ class BlockchainDatabase(object):
         cursor.execute(sql, (previous_hash, json_block))
         self.conn.commit()
 
-    def add_address(self, address, amount=0, spent=0):
+    def add_address(self, address, amount=0, spent=False):
         cursor = self.conn.cursor()
         sql = "INSERT INTO addresses (address, amount, spent) VALUES (?, ?, ?) ;"
         cursor.execute(sql, (address, amount, spent))
