@@ -28,6 +28,9 @@ class Transaction(object):
         # sign only if private key included
         self.sign(sender_public_key)
 
+    def __eq__(self, other):
+        return self.toJson() == other.toJson()
+
     def data_to_sign(self):
         return sha_256_bytes(self.toJson(False))
 
