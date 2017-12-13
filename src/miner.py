@@ -20,36 +20,40 @@ class Miner:
         self.index=0
 
     def create_block(self):
-        self.block= Block(self.blockchain.get_last_hash(),self.address,self.get_ordered_transactions())
-        # remove transactions if not valid
-        if not self.block.valid_transactions(self.blockchain):
-            self.block.set_transactions([])
+        self.block= Block(self.blockchain.get_last_hash(), self.address)
+        self.block.set_transactions(self.get_transactions())
+        self.index = 0
 
-    def get_ordered_transactions(self):
+    def get_transactions(self):
         """Allow to choose wich transactions will be placed in the block
         For now, it just take them in the chronological order"""
         ts = self.relay.get_transactions()
         if ts is None:
             return []
+        # filter invalid transactions
+        ts = list(filter(lambda t: t.is_valid(self.blockchain), ts))
+        # TODO: sort as you want (fee ?)
         return ts
 
     def run(self,strategy):
         """Strategy is the function called to find the next PoW"""
+        print('Mining for address '+str(self.address)+' ', end='')
         self.create_block()
         while(1):
-            if(self.flag == 0): #Check if a new block has been found
+            if self.flag == 0: # check relay for new block
                 self.flag = Miner.FLAG
-                if self.updater.update(): # New block has been found
+                if self.updater.update():
+                    print('Downloaded new block')
+                    print('Mining for address '+str(self.address)+' ', end='')
                     self.create_block()
+                print('.', end='', flush=True) # show state to the user
             self.flag = self.flag - 1
-            self.mine(strategy)
+            self.block.set_proof(strategy(self.index))
+            self.index = self.index + 1
             if(self.block.good_difficulty()):
+                print('\nMined block '+self.block.get_hash())
                 self.relay.submit_block(self.block)
                 self.flag = 0 #Need to take new transactions
-
-    def mine(self,strategy):
-        self.block.set_proof(strategy(self.index))
-        self.index = self.index +1
 
 def randompow(previousPow=0):
     return random.randint(0,2**256)
@@ -59,7 +63,6 @@ if __name__ == '__main__':
     if not argc == 2:
         exit('usage: python3 '+sys.argv[0]+' YOUR_ADDRESS' )
 
-    print('Starting miner with address '+str(sys.argv[1]))
     b = Blockchain('miner')
     miner = Miner(b, sys.argv[1])
     miner.run(randompow)
