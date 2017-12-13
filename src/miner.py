@@ -32,6 +32,10 @@ class Miner:
             return []
         # filter invalid transactions
         ts = list(filter(lambda t: t.is_valid(self.blockchain), ts))
+        # transactions can be valid alone and invalid together
+        # (e.g. 2 transactions with same sender)
+        if not self.block.valid_transactions(self.blockchain):
+            self.block.set_transactions([])
         # TODO: sort as you want (fee ?)
         return ts
 
