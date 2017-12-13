@@ -106,7 +106,8 @@ class RelayHandler(EasyHandler):
         b = EasyHandler.post_block(self, json)
         if not b is None:
             # if block is ok, submit to master
-            self.server.master.submit_block(Block.fromJson(json))
+            self.server.master.submit_block(b)
+            self.check_transactions()
 
     def get_transactions(self):
         json_ts = [t.toJson() for t in self.server.transactions]
@@ -124,6 +125,13 @@ class RelayHandler(EasyHandler):
             self.server.transactions.append(t)
             self.no_response(200) # OK
             self.broadcast_transaction(t)
+
+    def check_transactions(self):
+        # remove invalid transactions
+        self.server.transactions = list(filter(
+            lambda t: t.is_valid(self.server.blockchain),
+            self.server.transactions
+        ))
 
     def broadcast_transaction(self, t):
         for r in self.server.relays:
