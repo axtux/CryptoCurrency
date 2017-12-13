@@ -46,23 +46,28 @@ class Address(object):
         """Encrypt the private key with AES
         """
         if not self.dsa.has_private():
-            return
+            return False
         # encoding key as numeric string is fine
         self.enc = aes(password).encrypt(str(self.dsa.x)).hex()
         # only public key
         self.dsa = self.dsa.publickey()
+        return True
 
     def decryptPrivateKey(self, password):
         """DEcrypt the private key with AES
         """
         if self.dsa.has_private() or self.enc is None:
-            return
+            return False
         # decode int from numeric string
-        x = int(aes(password).decrypt(bytes.fromhex(self.enc)))
+        try:
+            x = int(aes(password).decrypt(bytes.fromhex(self.enc)))
+        except ValueError:
+            return False
         # build private key
         d = self.dsa
         self.dsa = DSA.construct((d.y, d.g, d.p, d.q, x))
         self.enc = None
+        return True
 
     def toJson(self):
         data = {}
