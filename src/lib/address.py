@@ -1,4 +1,5 @@
 import json
+from Crypto.Random import random
 from Crypto.PublicKey import DSA
 
 # local imports
@@ -25,6 +26,21 @@ class Address(object):
 
     def public(self):
         return Address(self.dsa.publickey())
+    
+    def sign(self, data):
+        """expect data as bytes
+        """
+        if not self.dsa.has_private():
+            return
+        k = random.randint(1, self.dsa.q-1)
+        return self.dsa.sign(data, k)
+
+    def good_signature(self, data, signature):
+        """expect data as bytes and signature as tuple returned by sign()
+        """
+        if signature is None:
+            return False
+        return self.dsa.verify(data, signature)
 
     def encryptPrivateKey(self, password):
         """Encrypt the private key with AES
@@ -64,7 +80,8 @@ class Address(object):
             data['enc'] = self.enc
         except AttributeError:
             pass
-        return json.dumps(data)
+        # sort keys for consistency
+        return json.dumps(data, sort_keys=True)
 
     @staticmethod
     def fromJson(json_dsa):

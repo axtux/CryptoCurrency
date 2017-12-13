@@ -24,32 +24,25 @@ class Transaction(object):
         """
         # avoid transporting private key with transaction
         self.sender_public_key = sender_public_key.public()
-        # JSON jump needed to have save representation and same signature
-        self.receivers = json.loads(json.dumps(receivers))
-        self.signature = None
+        self.receivers = receivers
+        # sign only if private key included
+        self.sign(sender_public_key)
+
+    def data_to_sign(self):
+        return sha_256_bytes(self.toJson(False))
 
     def sign(self, private_key):
-        """Sign the transactions
+        """Sign the transaction
            private_key: Address object
         """
         if private_key.public() != self.sender_public_key:
             return False
-        # TODO use true random number :-/
-        k = random.randint(2, private_key.dsa.q - 1)
-        m = sha_256_bytes(str(self.sender_public_key)+str(self.receivers))
-        self.signature = private_key.dsa.sign(m,k)
+        self.signature = private_key.sign(self.data_to_sign())
 
     def is_signed(self):
-        """Return True if the transaction is correctly sign
+        """Return True if the transaction is correctly signed
         """
-        if self.signature is None:
-            debug('no signature')
-            return False
-        m = sha_256_bytes(str(self.sender_public_key)+str(self.receivers))
-        signed = self.sender_public_key.dsa.verify(m, self.signature)
-        if not signed:
-            debug('bad signature')
-        return signed
+        return self.sender_public_key.good_signature(self.data_to_sign(), self.signature)
 
     def get_total_amount(self):
         """Return total amount of money processed
@@ -57,6 +50,7 @@ class Transaction(object):
         total = 0
         for addr, amount in self.receivers:
             if amount < 1:
+                debug('amount < 1')
                 return False
             total += amount
         return total
@@ -84,12 +78,14 @@ class Transaction(object):
         """
         return str(self.sender_public_key)
 
-    def toJson(self):
-        return json.dumps({
-                "sender_public_key": self.sender_public_key.toJson(),
-                "receivers": self.receivers,
-                "signature": self.signature,
-            })
+    def toJson(self, includeSingature=True):
+        data = {}
+        data['sender_public_key'] = self.sender_public_key.toJson()
+        data['receivers'] = self.receivers
+        if includeSingature:
+            data['signature'] = self.signature
+        # sort keys for consistency
+        return json.dumps(data, sort_keys=True)
 
     @staticmethod
     def fromJson(data):
