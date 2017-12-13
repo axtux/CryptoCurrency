@@ -41,24 +41,20 @@ def transfer(bc, relay, from_addr, to_addr, amount):
         exit('not enough money for this transfer')
     
     pwd = getpass.getpass()
-    # TODO: check bad pwd
-    f.decryptPrivateKey(pwd)
+    while not f.decryptPrivateKey(pwd):
+        print('Invalid password')
+        pwd = getpass.getpass()
     
     receivers = [(to_addr, amount)]
     if total > amount:
-        print('creating new address for remaining funds')
         new = Address()
         new.encryptPrivateKey(pwd)
+        db.add_address('client', new, 0)
+        print('created new address '+str(new)+' to receive remaining funds')
         receivers.append((str(new), total - amount))
-    else:
-        new = None
     t = Transaction(f, receivers)
     if relay.submit_transaction(t):
-        if new is None:
-            print('transaction sent to the network')
-        else:
-            db.add_address('client', new, 0)
-            print('transaction sent to the network, your new address is '+str(new))
+        print('transaction sent to the network')
     else:
         print('error sending transaction')
 
@@ -74,7 +70,7 @@ if __name__ == '__main__':
     bc = Blockchain('client')
     relay = RelayClient()
     u = Updater(bc, relay)
-    print('updating blockchain')
+    print('updating blockchain ...')
     u.update()
     
     # parse arguments
@@ -89,8 +85,9 @@ if __name__ == '__main__':
         create_address()
     elif av[1] == 'transfer':
         try:
-            transfer(bc, relay, av[2], av[3], int(av[4]))
+            (from_addr, to_addr, amount) = (av[2], av[3], int(av[4]))
         except (IndexError, ValueError): # not enough args or AMOUNT not int
             exit('usage: python3 '+av[0]+' transfer FROM_ADDR TO_ADDR AMOUNT')
+        transfer(bc, relay, from_addr, to_addr, amount)
     else:
         usage()
