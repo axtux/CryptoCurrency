@@ -63,7 +63,7 @@ class Blockchain(object):
         return int(r[1])
 
     def is_spent(self, address):
-        r = self.db.get_address(address)
+        r = self.db.get_address(str(address))
         if r is None:
             return False
         return bool(r[2])
