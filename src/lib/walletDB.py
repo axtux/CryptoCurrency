@@ -56,7 +56,7 @@ def userExist(user_ID, hashPassword):
     cursor.execute("""SELECT ID FROM users WHERE (ID=? AND hashPass=?)""", (user_ID, hashPassword))
     client = cursor.fetchone()
     conn.close()
-    return client != None
+    return not client is None
 
 def newUser(user_ID, hashPassword):
     """Create a new user in the DB

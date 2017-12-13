@@ -86,7 +86,7 @@ class RelayClient(MasterClient):
         ts = []
         for json in json_ts:
             t = Transaction.fromJson(json)
-            if t != None:
+            if not t is None:
                 ts.append(t)
         return ts
 

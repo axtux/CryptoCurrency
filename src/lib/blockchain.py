@@ -37,7 +37,7 @@ class Blockchain(object):
         hash_temp = Blockchain.FIRST_HASH
         next_block = self.get_next_block(hash_temp)
         i = 0
-        while next_block != None:
+        while not next_block is None:
             temp += "block " + str(i) + " is \n" + str(next_block.toJson()) + "\n"
             i += 1
             hash_temp = next_block.get_hash()
