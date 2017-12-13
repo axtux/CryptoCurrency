@@ -50,10 +50,15 @@ def transfer(bc, relay, from_addr, to_addr, amount):
         new = Address()
         new.encryptPrivateKey(pwd)
         receivers.append((str(new), total - amount))
+    else:
+        new = None
     t = Transaction(f, receivers)
     if relay.submit_transaction(t):
-        db.add_address('client', new, 0)
-        print('transaction sent to the network, your new address is '+str(new))
+        if new is None:
+            print('transaction sent to the network')
+        else:
+            db.add_address('client', new, 0)
+            print('transaction sent to the network, your new address is '+str(new))
     else:
         print('error sending transaction')
 
