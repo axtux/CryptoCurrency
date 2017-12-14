@@ -90,7 +90,6 @@ class Blockchain(object):
         # transactions are already checked within block
         for t in block.transactions:
             sender = t.senderAddress()
-            self.db.add_address(sender)
             self.db.set_address_spent(sender, True)
             self.update_addresses_amount(t.receivers)
         return True
