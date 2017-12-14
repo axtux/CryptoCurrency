@@ -90,6 +90,7 @@ class Blockchain(object):
         # transactions are already checked within block
         for t in block.transactions:
             sender = t.senderAddress()
+            self.db.add_address(sender)
             self.db.set_address_spent(sender, True)
             self.update_addresses_amount(t.receivers)
         return True
@@ -300,9 +301,23 @@ if __name__ == '__main__':
     db.set_last_hash(block2.get_hash())
     previousHash3 = db.get_last_hash()
 
+    sender3_address = Address()
+    receiver31_address = Address()
+    receiver32_address = Address()
     miner3_address = Address()
-    block3 = Block(previousHash3, str(miner3_address), [transaction, transaction2])
-    block3.set_proof("96")
+    transaction3 = Transaction(sender3_address.public(), [(str(receiver31_address), 321), (str(receiver32_address), 333)])
+    print("transaction3")
+    print(str(transaction3.toJson()))
+    sender4_address = Address()
+    receiver41_address = Address()
+    receiver42_address = Address()
+    miner4_address = Address()
+    transaction4 = Transaction(sender4_address.public(), [(str(receiver41_address), 321), (str(receiver42_address), 333)])
+    print("transaction4")
+    print(str(transaction4.toJson()))
+
+    block3 = Block(previousHash3, str(miner3_address), [transaction3, transaction4])
+    block3.set_proof("222")
     print("block3")
     print(str(block3.toJson()))
     json_block3 = block3.toJson()
