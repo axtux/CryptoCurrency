@@ -22,8 +22,8 @@ def bytesToInt(b):
     return int.from_bytes(b, 'big')
 
 def aes(pwd, iv):
-    h = sha_256(pwd)
-    return AES.new(h[16:48], AES.MODE_CFB, bytes.fromhex(iv))
+    h = sha_256_bytes(pwd)
+    return AES.new(h[16:], AES.MODE_CFB, bytes.fromhex(iv))
 
 def sha_256(text):
     """hash the content of text
