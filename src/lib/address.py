@@ -9,12 +9,9 @@ class Address(object):
     """manage DSA asymetric keys and adds some methods
     used as private and public key for the Wallet
     """
-    def __init__(self, dsa=None, iv=iv()):
+    def __init__(self, dsa=DSA.generate(1024), iv=iv()):
+        self.dsa = dsa
         self.iv = iv
-        if dsa is None:
-            self.dsa = DSA.generate(1024)
-        else:
-            self.dsa = dsa
 
     def __str__(self):
         """Create hash from public key to make an address
