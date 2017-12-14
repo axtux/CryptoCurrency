@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
     
     def test_encrypted(self):
         a = Address()
-        b = Address(a.dsa, a.iv)
+        b = Address(a.dsa)
         b.encryptPrivateKey('pwd')
         b.decryptPrivateKey('pwd')
         self.assertTrue(self.equalAddresses(a, b))

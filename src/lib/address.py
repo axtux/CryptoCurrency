@@ -69,8 +69,6 @@ class Address(object):
 
     def toJson(self):
         data = {}
-        # IV
-        data['iv'] = self.iv
         # public key fields
         data['y'] = self.dsa.y
         data['g'] = self.dsa.g
@@ -83,6 +81,7 @@ class Address(object):
             pass
         try:
             data['enc'] = self.enc
+            data['iv'] = self.iv
         except AttributeError:
             pass
         # sort keys for consistency
@@ -96,9 +95,10 @@ class Address(object):
                 t = (data['y'], data['g'], data['p'], data['q'], data['x'])
             else: # only public key
                 t = (data['y'], data['g'], data['p'], data['q'])
-            a = Address(dsa=DSA.construct(t), iv=data['iv'])
-            if 'enc' in data:
+            a = Address(dsa=DSA.construct(t))
+            if 'enc' in data and 'iv' in data:
                 a.enc = data['enc']
+                a.iv = data['iv']
             return a
         # JSON ValueError for decode
         # KeyError if no accessed key
