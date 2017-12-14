@@ -3,13 +3,14 @@ from Crypto.Random import random
 from Crypto.PublicKey import DSA
 
 # local imports
-from lib.utils import ripemd_160, aes
+from lib.utils import ripemd_160, aes, iv
 
 class Address(object):
     """manage DSA asymetric keys and adds some methods
     used as private and public key for the Wallet
     """
-    def __init__(self, dsa=None):
+    def __init__(self, dsa=None, iv=iv()):
+        self.iv = iv
         if dsa is None:
             self.dsa = DSA.generate(1024)
         else:
@@ -26,13 +27,13 @@ class Address(object):
 
     def public(self):
         return Address(self.dsa.publickey())
-    
+
     def sign(self, data):
         """expect data as bytes
         """
         if not self.dsa.has_private():
             return
-        k = random.randint(1, self.dsa.q-1)
+        k = random.StrongRandom().randint(1,self.dsa.q-1)
         return self.dsa.sign(data, k)
 
     def good_signature(self, data, signature):
@@ -48,7 +49,7 @@ class Address(object):
         if not self.dsa.has_private():
             return False
         # encoding key as numeric string is fine
-        self.enc = aes(password).encrypt(str(self.dsa.x)).hex()
+        self.enc = aes(password, self.iv).encrypt(str(self.dsa.x)).hex()
         # only public key
         self.dsa = self.dsa.publickey()
         return True
@@ -60,7 +61,7 @@ class Address(object):
             return False
         # decode int from numeric string
         try:
-            x = int(aes(password).decrypt(bytes.fromhex(self.enc)))
+            x = int(aes(password, self.iv).decrypt(bytes.fromhex(self.enc)))
         except ValueError:
             return False
         # build private key
@@ -71,6 +72,8 @@ class Address(object):
 
     def toJson(self):
         data = {}
+        # IV
+        data['iv'] = self.iv
         # public key fields
         data['y'] = self.dsa.y
         data['g'] = self.dsa.g
@@ -96,7 +99,7 @@ class Address(object):
                 t = (data['y'], data['g'], data['p'], data['q'], data['x'])
             else: # only public key
                 t = (data['y'], data['g'], data['p'], data['q'])
-            a = Address(DSA.construct(t))
+            a = Address(dsa=DSA.construct(t), iv=data['iv'])
             if 'enc' in data:
                 a.enc = data['enc']
             return a

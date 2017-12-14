@@ -12,15 +12,18 @@ def generatePrime(n):
      """
      return number.getPrime(n)
 
+def iv():
+    return Random.new().read(AES.block_size).hex()
+
 def intToBytes(n):
     return n.to_bytes((n.bit_length()+7) // 8, 'big')
 
 def bytesToInt(b):
     return int.from_bytes(b, 'big')
 
-def aes(pwd):
+def aes(pwd, iv):
     h = sha_256(pwd)
-    return AES.new(h[16:48], AES.MODE_CFB, h[:16])
+    return AES.new(h[16:48], AES.MODE_CFB, bytes.fromhex(iv))
 
 def sha_256(text):
     """hash the content of text
